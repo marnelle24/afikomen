@@ -1,36 +1,185 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Afikomen App
 
-## Getting Started
+A responsive web application where users can log in, input a Bible verse, and receive both the verse text and AI-generated insights including context, modern reflection, weekly action plans, and prayers.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 🔐 Authentication
+- User registration and login
+- Secure JWT-based session management
+- Protected routes and API endpoints
+
+### 📖 Main Features
+- **Free-Form Verse Input**: Enter Bible verses in ANY format (e.g., "John 3:16", "john 3 16", "John chapter 3 verse 16")
+- **Multiple Bible Versions**: Support for NIV, KJV, and ESV
+- **AI-Powered Insights**: Structured analysis including:
+  - Verse content
+  - Historical context
+  - Modern reflection
+  - 7-day weekly action plan
+  - Short prayer
+- **Verse History**: Save and revisit past verse reflections
+- **Responsive Design**: Mobile-first UI with Tailwind CSS
+
+### 🎨 UI/UX
+- Clean, modern interface
+- Mobile-responsive design
+- Intuitive navigation
+- Beautiful card layouts for results
+- 7-day action plan grid display
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: MySQL with Prisma ORM
+- **Authentication**: JWT tokens
+- **Verse & AI Integration**: OpenAI GPT-4 (for both verse fetching and insights)
+- **Icons**: Lucide React
+
+## Prerequisites
+
+- Node.js 18+ 
+- MySQL database (or PostgreSQL)
+- OpenAI API key
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd afikomen
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   Create a `.env.local` file in the root directory:
+   ```env
+   # Database
+   DATABASE_URL="mysql://root:root@localhost:3306/bible_verse_app"
+
+   # JWT Secret
+   JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+
+   # OpenAI API Key (used for both verse fetching and AI insights)
+   OPENAI_API_KEY="your-openai-api-key"
+   ```
+
+4. **Set up the database**
+   ```bash
+   # Generate Prisma client
+   npx prisma generate
+   
+   # Run database migrations
+   npx prisma migrate dev
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get current user info
+
+### Verses
+- `POST /api/verse` - Process a Bible verse and generate insights
+- `GET /api/verses` - Get user's saved verses
+
+## Usage
+
+1. **Create an Account**: Register with your email and password
+2. **Explore Verses**: Enter a Bible verse in ANY format you prefer:
+   - Standard format: "John 3:16"
+   - Casual format: "john 3 16" 
+   - Natural language: "John chapter 3 verse 16"
+3. **Choose Version**: Select from NIV, KJV, or ESV
+4. **Get Insights**: Receive AI-generated analysis including:
+   - Verse content
+   - Historical context
+   - Modern application
+   - 7-day action plan
+   - Prayer
+5. **Save & Revisit**: All insights are automatically saved to your history
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   │   ├── auth/          # Authentication endpoints
+│   │   └── verse/         # Verse processing endpoints
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Main page
+├── components/            # React components
+│   ├── Header.tsx         # Navigation header
+│   ├── LoginForm.tsx      # Login form
+│   ├── RegisterForm.tsx   # Registration form
+│   ├── VerseForm.tsx      # Verse input form
+│   ├── VerseResults.tsx   # Results display
+│   └── VerseHistory.tsx   # History component
+├── contexts/              # React contexts
+│   └── AuthContext.tsx    # Authentication context
+└── lib/                   # Utility libraries
+    ├── ai.ts              # OpenAI integration
+    ├── auth.ts            # Authentication utilities
+    ├── bible-api.ts       # Bible API integration
+    └── db.ts              # Database connection
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Database (PostgreSQL)
+1. Install PostgreSQL locally or use a cloud service
+2. Create a database named `bible_verse_app`
+3. Update the `DATABASE_URL` in your `.env.local`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### OpenAI API
+1. Sign up at [OpenAI](https://openai.com)
+2. Create an API key
+3. Add it to your `.env.local` as `OPENAI_API_KEY`
+4. Note: OpenAI is used for both fetching Bible verses and generating AI insights
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+### Vercel (Recommended)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Database for Production
+- Use a managed PostgreSQL service like:
+  - Vercel Postgres
+  - Supabase
+  - PlanetScale
+  - Railway
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License.
+
+## Support
+
+For support or questions, please open an issue in the GitHub repository.
