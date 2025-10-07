@@ -43,7 +43,7 @@ A responsive web application where users can log in, input a Bible verse, and re
 - MySQL database (or PostgreSQL)
 - OpenAI API key
 
-## Installation
+<!-- ## Installation -->
 <!-- 
 1. **Clone the repository**
    ```bash
