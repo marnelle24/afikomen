@@ -23,7 +23,7 @@ interface AuthContextType {
   user: User | null
   token: string | null
   tokenInfo: TokenInfo | null
-  login: (token: string, user: User) => void
+  login: (token: string, user: User) => Promise<void>
   logout: () => void
   loading: boolean
   refreshTokenInfo: () => Promise<void>
@@ -111,10 +111,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = (newToken: string, newUser: User) => {
+  const login = async (newToken: string, newUser: User) => {
     localStorage.setItem('token', newToken)
     setToken(newToken)
     setUser(newUser)
+    
+    // Fetch token info immediately after login
+    try {
+      const response = await fetch('/api/tokens', {
+        headers: {
+          'Authorization': `Bearer ${newToken}`
+        }
+      })
+      const data = await response.json()
+      if (data.success) {
+        setTokenInfo(data.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch token info after login:', error)
+    }
   }
 
   const logout = () => {

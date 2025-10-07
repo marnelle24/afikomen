@@ -9,6 +9,7 @@ import RegisterForm from '@/components/RegisterForm'
 import Header from '@/components/Header'
 import VerseForm from '@/components/VerseForm'
 import VerseResults from '@/components/VerseResults'
+import RecentVerses from '@/components/RecentVerses'
 // import DebugAuth from '@/components/DebugAuth'
 
 interface CopyAllButtonProps {
@@ -169,6 +170,10 @@ export default function Home() {
                     insight={currentResults.insight}
                   />
                 </div>
+              )}
+
+              {user && (
+                <RecentVerses showTitle={true} limit={3} />
               )}
             </div>
           </div>

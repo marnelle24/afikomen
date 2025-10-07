@@ -40,7 +40,7 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
       const data = await response.json()
 
       if (response.ok) {
-        login(data.token, data.user)
+        await login(data.token, data.user)
       } else {
         setError(data.error || 'Registration failed')
       }

@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
         modernReflection: true,
         weeklyActionPlan: true,
         shortPrayer: true,
-        createdAt: true
+        createdAt: true,
+        tokenUsed: true
       }
     })
 

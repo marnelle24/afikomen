@@ -62,20 +62,6 @@ export async function GET(request: NextRequest) {
 
     const favoriteVersion = Object.entries(versionCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A'
 
-    // Get 5 most recent verses
-    const recentVerses = await prisma.verse.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      select: {
-        id: true,
-        reference: true,
-        version: true,
-        verseContent: true,
-        createdAt: true
-      }
-    })
-
     return NextResponse.json({
       totalVerses,
       versesThisWeek,
@@ -83,8 +69,7 @@ export async function GET(request: NextRequest) {
         ...tokenUsage,
         totalTokensUsedInVerses
       },
-      favoriteVersion,
-      recentVerses
+      favoriteVersion
     })
   } catch (error) {
     console.error('Dashboard error:', error)

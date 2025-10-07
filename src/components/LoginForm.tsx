@@ -31,7 +31,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
       const data = await response.json()
 
       if (response.ok) {
-        login(data.token, data.user)
+        await login(data.token, data.user)
       } else {
         setError(data.error || 'Login failed')
       }

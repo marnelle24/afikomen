@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { BookOpen, Calendar, Copy, Check, X, Sparkles, Heart, Target, ChevronRight, Search } from 'lucide-react'
+import { BookOpen, Calendar, Copy, Check, X, Sparkles, Heart, Target, ChevronRight, Search, Coins } from 'lucide-react'
 
 interface Verse {
   id: string
@@ -14,6 +14,7 @@ interface Verse {
   weeklyActionPlan: Array<{ title: string; action: string }>
   shortPrayer: string
   createdAt: string
+  tokenUsed: number
 }
 
 export default function VerseHistory() {
@@ -172,7 +173,10 @@ Prayer:
                     <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 font-light leading-relaxed">{verse.verseContent}</p>
                   </div>
                   
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-start gap-3 flex-shrink-0">
+                    <div className="flex items-center font-light text-[11px] italic text-slate-400 dark:text-slate-400">
+                      {verse.tokenUsed} tokens
+                    </div>
                     <div className="flex items-center font-light text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-gray-600 px-3 py-1.5 rounded-full">
                       <Calendar className="h-3 w-3 mr-1.5" />
                       {formatDate(verse.createdAt)}
@@ -206,6 +210,10 @@ Prayer:
                   <div className="flex items-center gap-2 text-white/90 text-sm">
                     <Calendar className="h-4 w-4" />
                     <span>{formatDate(selectedVerse.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/90 text-sm">
+                    <Coins className="h-4 w-4" />
+                    <span>{selectedVerse.tokenUsed} tokens used</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
