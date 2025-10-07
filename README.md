@@ -44,7 +44,7 @@ A responsive web application where users can log in, input a Bible verse, and re
 - OpenAI API key
 
 ## Installation
-
+<!-- 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
@@ -84,7 +84,7 @@ A responsive web application where users can log in, input a Bible verse, and re
    ```
 
 6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+   Navigate to [http://localhost:3000](http://localhost:3000) -->
 
 ## API Endpoints
 
