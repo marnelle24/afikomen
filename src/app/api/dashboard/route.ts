@@ -38,23 +38,21 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Get verses from this month
-    const monthAgo = new Date()
-    monthAgo.setMonth(monthAgo.getMonth() - 1)
-    const versesThisMonth = await prisma.verse.count({
-      where: {
-        userId: user.id,
-        createdAt: {
-          gte: monthAgo
-        }
-      }
+    // Get token usage information from user object (should include token fields)
+    const userWithTokens = user as typeof user & { tokensUsed: number; tokenBalance: number }
+    const tokenUsage = {
+      tokensUsed: userWithTokens.tokensUsed || 0,
+      tokenBalance: userWithTokens.tokenBalance || 1000,
+      remainingTokens: (userWithTokens.tokenBalance || 1000) - (userWithTokens.tokensUsed || 0)
+    }
+
+    // Get all verses to determine favorite version and total tokens used
+    const allVerses = await prisma.verse.findMany({
+      where: { userId: user.id }
     })
 
-    // Get all verses to determine favorite version
-    const allVerses = await prisma.verse.findMany({
-      where: { userId: user.id },
-      select: { version: true }
-    })
+    // Calculate total tokens used across all verses
+    const totalTokensUsedInVerses = allVerses.reduce((total, verse) => total + ((verse as any).tokenUsed || 0), 0)
 
     // Calculate favorite version
     const versionCounts = allVerses.reduce((acc, verse) => {
@@ -81,7 +79,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       totalVerses,
       versesThisWeek,
-      versesThisMonth,
+      tokenUsage: {
+        ...tokenUsage,
+        totalTokensUsedInVerses
+      },
       favoriteVersion,
       recentVerses
     })

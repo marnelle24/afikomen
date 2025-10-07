@@ -38,7 +38,7 @@ export default function VerseForm({ onVerseProcessed }: VerseFormProps) {
   const [version, setVersion] = useState(BIBLE_VERSIONS[0].value)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { token } = useAuth()
+  const { token, refreshTokenInfo } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,8 +60,15 @@ export default function VerseForm({ onVerseProcessed }: VerseFormProps) {
       if (response.ok) {
         onVerseProcessed(data.data)
         setReference('')
+        // Refresh token info after successful processing
+        await refreshTokenInfo()
       } else {
-        setError(data.error || 'Failed to process verse')
+        if (response.status === 402) {
+          // Token insufficient error
+          setError(data.message || data.error || 'Insufficient tokens')
+        } else {
+          setError(data.error || 'Failed to process verse')
+        }
       }
     } catch {
       setError('Network error. Please try again.')

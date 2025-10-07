@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromToken } from '@/lib/auth'
+import { getUserFromToken, checkUserTokens } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
     }
 
     const user = await getUserFromToken(token)
-    
     if (!user) {
       return NextResponse.json(
         { error: 'Invalid token' },
@@ -21,20 +20,24 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ 
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+    // Get current token status
+    const tokenStatus = await checkUserTokens(user.id)
+
+    return NextResponse.json({
+      success: true,
+      data: {
         tokenBalance: user.tokenBalance,
-        tokensUsed: user.tokensUsed,
-        lastTokenReset: user.lastTokenReset
+        tokensUsed: tokenStatus.tokensUsed,
+        remainingTokens: tokenStatus.remainingTokens,
+        lastTokenReset: user.lastTokenReset,
+        hasTokens: tokenStatus.hasTokens
       }
     })
   } catch (error) {
-    console.error('Auth check error:', error)
+    console.error('Token balance error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Failed to get token balance'
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

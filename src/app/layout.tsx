@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Afikomen | Uncovering God\'s word, One verse at a time',
   description: 'Discover deeper meaning of God\'s word and be transformed by His amazing love & grace.',
+  icons: {
+    icon: '/afikomen.png',
+    shortcut: '/afikomen.png',
+    apple: '/afikomen.png',
+  },
 }
 
 export default function RootLayout({

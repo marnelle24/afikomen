@@ -35,6 +35,85 @@ export async function getUserFromToken(token: string) {
   
   return prisma.user.findUnique({
     where: { id: payload.userId },
-    select: { id: true, email: true, name: true }
+    select: { 
+      id: true, 
+      email: true, 
+      name: true,
+      tokenBalance: true,
+      tokensUsed: true,
+      lastTokenReset: true
+    }
   })
+}
+
+// Token management functions
+export async function checkUserTokens(userId: string): Promise<{ hasTokens: boolean; remainingTokens: number; tokensUsed: number }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { tokenBalance: true, tokensUsed: true, lastTokenReset: true }
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  // Check if we need to reset tokens (monthly reset)
+  const now = new Date()
+  const lastReset = new Date(user.lastTokenReset)
+  const shouldReset = now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()
+
+  if (shouldReset) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        tokensUsed: 0,
+        lastTokenReset: now
+      }
+    })
+    return {
+      hasTokens: true,
+      remainingTokens: user.tokenBalance,
+      tokensUsed: 0
+    }
+  }
+
+  const remainingTokens = user.tokenBalance - user.tokensUsed
+  return {
+    hasTokens: remainingTokens > 0,
+    remainingTokens: Math.max(0, remainingTokens),
+    tokensUsed: user.tokensUsed
+  }
+}
+
+export async function deductTokens(userId: string, tokensToDeduct: number): Promise<{ success: boolean; remainingTokens: number; tokensUsed: number }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { tokenBalance: true, tokensUsed: true }
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const newTokensUsed = user.tokensUsed + tokensToDeduct
+  
+  if (newTokensUsed > user.tokenBalance) {
+    return {
+      success: false,
+      remainingTokens: Math.max(0, user.tokenBalance - user.tokensUsed),
+      tokensUsed: user.tokensUsed
+    }
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { tokensUsed: newTokensUsed },
+    select: { tokenBalance: true, tokensUsed: true }
+  })
+
+  return {
+    success: true,
+    remainingTokens: updatedUser.tokenBalance - updatedUser.tokensUsed,
+    tokensUsed: updatedUser.tokensUsed
+  }
 }

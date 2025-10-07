@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Verse` ADD COLUMN `tokenUsed` INTEGER NOT NULL DEFAULT 0;

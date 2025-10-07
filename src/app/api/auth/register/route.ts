@@ -32,6 +32,14 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        tokenBalance: true,
+        tokensUsed: true,
+        lastTokenReset: true
       }
     })
 
@@ -43,7 +51,10 @@ export async function POST(request: NextRequest) {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        tokenBalance: user.tokenBalance,
+        tokensUsed: user.tokensUsed,
+        lastTokenReset: user.lastTokenReset
       }
     })
   } catch (error) {

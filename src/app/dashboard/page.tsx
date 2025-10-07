@@ -5,12 +5,17 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import VerseHistory from '@/components/VerseHistory'
-import { BookOpen, TrendingUp, Calendar, ChevronRight, Copy, Check, Heart, Target } from 'lucide-react'
+import { BookOpen, TrendingUp, Calendar, ChevronRight, Copy, Check, Heart, Target, Coins } from 'lucide-react'
 
 interface DashboardStats {
   totalVerses: number
   versesThisWeek: number
-  versesThisMonth: number
+  tokenUsage: {
+    tokensUsed: number
+    tokenBalance: number
+    remainingTokens: number
+    totalTokensUsedInVerses: number
+  }
   favoriteVersion: string
   recentVerses: Array<{
     id: string
@@ -177,10 +182,18 @@ Prayer:
               <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-light text-orange-500 dark:text-orange-300">This Month</p>
-                    <p className="text-3xl font-bold text-orange-400 dark:text-orange-300 mt-2">{stats.versesThisMonth}</p>
+                    <p className="text-sm font-light text-orange-500 dark:text-orange-300">Token Usage</p>
+                    <p className="text-3xl font-bold text-orange-400 dark:text-orange-300 mt-2">
+                      {stats.tokenUsage.tokensUsed}/{stats.tokenUsage.tokenBalance}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      {stats.tokenUsage.remainingTokens} remaining
+                    </p>
+                    {/* <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                      {stats.tokenUsage.totalTokensUsedInVerses} total used
+                    </p> */}
                   </div>
-                  <Calendar className="h-8 w-8 text-orange-400 dark:text-orange-300" />
+                  <Coins className="h-8 w-8 text-orange-400 dark:text-orange-300" />
                 </div>
               </div>
             </div>

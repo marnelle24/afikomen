@@ -13,6 +13,7 @@ export interface VerseInsight {
     action: string
   }>
   short_prayer: string
+  tokens_used: number
 }
 
 export async function generateVerseInsight(
@@ -67,10 +68,19 @@ Guidelines:
       throw new Error('No response from AI')
     }
 
+    // Get token usage from the completion
+    const tokensUsed = completion.usage?.total_tokens || 0
+
     // Parse the JSON response
-    const insight = JSON.parse(responseText) as VerseInsight
+    const insight = JSON.parse(responseText) as Omit<VerseInsight, 'tokens_used'>
     
-    return insight
+    // Add token usage to the insight
+    const insightWithTokens: VerseInsight = {
+      ...insight,
+      tokens_used: tokensUsed
+    }
+    
+    return insightWithTokens
   } catch (error) {
     console.error('Error generating AI insight:', error)
     throw new Error('Failed to generate verse insight')
