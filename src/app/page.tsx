@@ -9,7 +9,7 @@ import RegisterForm from '@/components/RegisterForm'
 import Header from '@/components/Header'
 import VerseForm from '@/components/VerseForm'
 import VerseResults from '@/components/VerseResults'
-import DebugAuth from '@/components/DebugAuth'
+// import DebugAuth from '@/components/DebugAuth'
 
 interface CopyAllButtonProps {
   reference: string;
