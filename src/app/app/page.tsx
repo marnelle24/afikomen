@@ -89,10 +89,10 @@ export default function AppPage() {
     };
   } | null>(null)
 
-  // Redirect to auth if not logged in
+  // Redirect to login if not logged in
   React.useEffect(() => {
     if (!loading && !user) {
-      router.push('/auth')
+      router.push('/login')
     }
   }, [user, loading, router])
 

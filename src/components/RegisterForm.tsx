@@ -4,11 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
-interface RegisterFormProps {
-  onToggleMode: () => void
-}
-
-export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
+export default function RegisterForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -122,21 +118,14 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
 
         <button
           type="submit"
-          disabled={loading}
-          className="cursor-pointer w-full flex font-regular hover:-translate-y-0.5 duration-300 uppercase tracking-widest justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:opacity-50"
+          disabled={true}
+          // disabled={loading}
+          className="disabled:cursor-not-allowed disabled:bg-orange-600 cursor-pointer w-full flex font-regular hover:-translate-y-0.5 duration-300 uppercase tracking-widest justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:opacity-50"
         >
-          {loading ? 'Creating account...' : 'Create account'}
+          {/* {loading ? 'Creating account...' : 'Create account'} */}
+          Registration is disabled...
         </button>
       </form>
-
-      <div className="mt-16 text-center">
-        <button
-          onClick={onToggleMode}
-          className="font-thin text-orange-400 cursor-pointer dark:text-orange-400 duration-300 transition-colors hover:text-orange-500 dark:hover:text-orange-200 text-sm"
-        >
-          Already have an account? Sign in
-        </button>
-      </div>
     </div>
   )
 }

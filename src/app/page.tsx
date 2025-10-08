@@ -96,7 +96,7 @@ const StickyHeader = () => {
             ) : (
               <>
                 <Link
-                  href="/auth"
+                  href="/login"
                   className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Login"
                 >
@@ -105,7 +105,7 @@ const StickyHeader = () => {
                 </Link>
 
                 <Link
-                  href="/auth"
+                  href="/register"
                   className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Register"
                 >
@@ -181,9 +181,14 @@ const HeroSection = () => {
           transition={{ delay: 0.6 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+          onClick={() => {
+            document.getElementById('start-your-journey')?.scrollIntoView({ 
+              behavior: 'smooth' 
+            })
+          }}
+          className="bg-amber-600 cursor-pointer hover:bg-amber-700 text-white px-8 py-4 hover:scale-105 duration-500 transition-all rounded-full text-lg font-medium shadow-lg hover:shadow-xl"
         >
-          Explore the Meaning
+          Explore the Afikomen
         </motion.button>
       </div>
 
@@ -328,8 +333,9 @@ const AfikomenAppSection = () => {
               <motion.p
                 {...fadeInRight}
                 viewport={{ once: true }}
-                className="text-lg text-amber-700 dark:text-white">
+                className="lg:text-xl text-lg leading-relaxed tracking-wider font-light text-amber-700 dark:text-white">
                 Create an account to get started. You will need to sign up with your email and create a password.
+                Enjoy the Free 10,000 credits every month.
               </motion.p>
             </motion.div>
           </motion.div>
@@ -363,17 +369,16 @@ const AfikomenAppSection = () => {
               <motion.p
                 {...fadeInRight}
                 viewport={{ once: true }}
-                className="text-lg text-amber-700 dark:text-white">
+                className="lg:text-xl text-lg leading-relaxed tracking-wider font-light text-amber-700 dark:text-white">
                 Get the insights by searching for a gospel and the verse you need.
                 Using the deep learning model of AI agent, it will give you the following: 
               </motion.p>
 
-              <motion.ul className="text-lg text-amber-700 dark:text-white list-disc list-inside mt-8 list-style-circle">
+              <motion.ul className="lg:text-xl text-lg leading-relaxed tracking-wider font-light text-amber-700 dark:text-white list-disc list-inside mt-8 list-style-circle">
                 <li className="mb-2">Full biblical context of the verse</li>
                 <li className="mb-2">Historical background</li>
                 <li className="mb-2">7-day bible actionable plan</li>
-                <li className="mb-2">Prayer points</li>
-                <li className="mb-2">Daily Bible verse</li>
+                <li className="mb-2">Short Prayer based on the verse</li>
               </motion.ul>
             </motion.div>
             <Image 
@@ -395,7 +400,7 @@ const AfikomenAppSection = () => {
 // Start Your Journey Section
 const StartYourJourneySection = () => {
   return (
-    <section id="reflection" className="py-20 bg-gradient-to-b from-amber-50 to-amber-100 dark:from-slate-200/20 dark:to-slate-300/20">
+    <section id="start-your-journey" className="py-20 bg-gradient-to-b from-amber-50 to-amber-100 dark:from-slate-200/20 dark:to-slate-300/20">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -420,13 +425,15 @@ const StartYourJourneySection = () => {
               <p className="text-amber-700 dark:text-amber-300">— 1 Corinthians 5:7</p>
             </div>
             
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-amber-600 cursor-pointer duration-500 transition-all hover:bg-amber-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-lg hover:shadow-xl"
-            >
-              Create an Account & Start Your Journey Now!
-            </motion.button>
+            <Link href="/register">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-amber-600 cursor-pointer duration-500 transition-all hover:bg-amber-700 text-white px-8 py-4 rounded-full lg:text-lg text-[0.785rem] font-medium shadow-lg hover:shadow-xl"
+              >
+                Create an Account & Start Your Journey Now!
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
       </div>

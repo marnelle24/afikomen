@@ -4,11 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
-interface LoginFormProps {
-  onToggleMode: () => void
-}
-
-export default function LoginForm({ onToggleMode }: LoginFormProps) {
+export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -90,16 +86,6 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
-
-      <div className="mt-12 text-center">
-        <button
-          type="button"
-          onClick={onToggleMode}
-          className="font-thin cursor-pointer text-orange-400 dark:text-orange-400 duration-300 transition-colors hover:text-orange-500 dark:hover:text-orange-300 text-sm"
-        >
-          Don&apos;t have an account? Sign up
-        </button>
-      </div>
     </div>
   )
 }
