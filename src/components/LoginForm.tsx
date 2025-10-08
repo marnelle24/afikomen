@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface LoginFormProps {
@@ -13,6 +14,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { login } = useAuth()
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,6 +34,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
 
       if (response.ok) {
         await login(data.token, data.user)
+        router.push('/dashboard')
       } else {
         setError(data.error || 'Login failed')
       }

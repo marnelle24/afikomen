@@ -1,185 +1,481 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Copy, Check } from 'lucide-react'
+import Link from 'next/link'
+import Head from 'next/head'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useAuth } from '@/contexts/AuthContext'
-import LoginForm from '@/components/LoginForm'
-import RegisterForm from '@/components/RegisterForm'
-import Header from '@/components/Header'
-import VerseForm from '@/components/VerseForm'
-import VerseResults from '@/components/VerseResults'
-import RecentVerses from '@/components/RecentVerses'
-// import DebugAuth from '@/components/DebugAuth'
+import { 
+  BookOpen, 
+  ChevronDown,
+  Quote,
+  Moon,
+  Sun,
+  LogIn,
+  UserPlus,
+  LayoutDashboard
+} from 'lucide-react'
 
-interface CopyAllButtonProps {
-  reference: string;
-  insight: {
-    verse_content: string;
-    context: string;
-    modern_reflection: string;
-    weekly_action_plan: Array<{ title: string; action: string }>;
-    short_prayer: string;
-  };
+// Custom hook for scroll-based animations
+const useScrollAnimation = () => {
+  const { scrollYProgress } = useScroll()
+  const y = useTransform(scrollYProgress, [0, 1], [0, -50])
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0.6])
+  
+  return { y, opacity }
 }
 
-function CopyAllButton({ reference, insight }: CopyAllButtonProps) {
-  const [copied, setCopied] = useState(false)
+// Fade in animation variants
+const fadeInUp = {
+  initial: { opacity: 0, y: 60 },
+  animate: { opacity: 1, y: 0 }
+}
 
-  const copyAllContent = async () => {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    
-    const formattedContent = `${reference}
+const fadeInLeft = {
+  initial: { opacity: 0, x: -60 },
+  animate: { opacity: 1, x: 0 }
+}
 
-Verse:
-"${insight.verse_content}"
+const fadeInRight = {
+  initial: { opacity: 0, x: 60 },
+  animate: { opacity: 1, x: 0 }
+}
 
-Context:
-${insight.context}
+// Sticky Header Component
+const StickyHeader = () => {
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const { isDark, toggleTheme } = useTheme()
+  const { user } = useAuth()
 
-Reflection:
-${insight.modern_reflection}
-
-7-Day Action Plan:
-${insight.weekly_action_plan.map((day, index) => `${days[index]}: ${day.title}\n${day.action}`).join('\n\n')}
-
-Prayer:
-"${insight.short_prayer}"`
-
-    try {
-      await navigator.clipboard.writeText(formattedContent)
-      setCopied(true)
-      setTimeout(() => {
-        setCopied(false)
-      }, 2000)
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
+  useEffect(() => {
+    setMounted(true)
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100)
     }
-  }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <button
-      onClick={copyAllContent}
-      className="cursor-pointer flex items-center gap-2 px-4 py-2 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-800/50 transition-all duration-200 font-medium shadow-sm hover:shadow"
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-transparent dark:bg-transparent backdrop-blur-md' 
+          : 'bg-transparent'
+      }`}
     >
-      {copied ? (
-        <>
-          <Check className="h-3 w-3" />
-          Copied!
-        </>
-      ) : (
-        <>
-          <Copy className="h-3 w-3" />
-          Copy All
-        </>
-      )}
-    </button>
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <nav className="flex items-center justify-end">
+          <div className="flex items-center space-x-4">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="cursor-pointer rounded-md text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            
+            {!mounted ? (
+              // Placeholder to prevent hydration mismatch
+              <div className="w-24 h-6"></div>
+            ) : user ? (
+              <Link
+                href="/dashboard"
+                className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
+                title="Dashboard"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Dashboard</span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth"
+                  className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
+                  title="Login"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Login</span>
+                </Link>
+
+                <Link
+                  href="/auth"
+                  className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
+                  title="Register"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Register</span>
+                </Link>
+              </>
+            )}
+          </div>
+        </nav>
+      </div>
+    </motion.header>
   )
 }
 
-export default function Home() {
-  const { user, loading } = useAuth()
-  const [isRegisterMode, setIsRegisterMode] = useState(false)
-  const [currentResults, setCurrentResults] = useState<{
-    reference: string;
-    version: string;
-    insight: {
-      verse_content: string;
-      context: string;
-      modern_reflection: string;
-      weekly_action_plan: Array<{ title: string; action: string }>;
-      short_prayer: string;
-    };
-  } | null>(null)
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-400"></div>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <div className="flex flex-col items-center lg:mb-26 mb-24">
-              <Image 
-                src="/afikomen.png" 
-                alt="FaithLens Logo" 
-                width={250}
-                height={200}
-                className="object-contain w-60"
-              />
-              <p className="text-orange-400 dark:text-orange-300 font-normal dark:font-thin text-[10px] uppercase tracking-wider text-center mt-4">Uncovering God&apos;s word, one verse at a time</p>
-            </div>
-            <h2 className="text-3xl font-extrabold text-slate-600 dark:text-slate-200">
-              {isRegisterMode ? 'Create your account' : 'Sign in to your account'}
-            </h2>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-200">
-              {isRegisterMode 
-                ? 'Start your journey with Afikomen' 
-                : 'Welcome back! Continue exploring God\'s word'
-              }
-            </p>
-          </div>
-          
-          {isRegisterMode ? (
-            <RegisterForm onToggleMode={() => setIsRegisterMode(false)} />
-          ) : (
-            <LoginForm onToggleMode={() => setIsRegisterMode(true)} />
-          )}
-        </div>
-      </div>
-    )
-  }
+// Hero Section
+const HeroSection = () => {
+  const { y, opacity } = useScrollAnimation()
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background with parallax effect */}
+      <motion.div 
+        style={{ y, opacity }}
+        className="absolute inset-0 bg-gradient-to-br from-amber-50 via-cream-100 to-gold-100 dark:from-amber-900/20 dark:via-gray-900 dark:to-amber-800/10"
+      />
       
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-2xl lg:text-3xl font-bold text-slate-600 dark:text-slate-200 mb-2">
-                Welcome back!
-              </h1>
-              <p className="text-slate-600 font-light dark:text-slate-200 text-sm lg:text-base">
-                Discover deeper meaning of God&apos;s word and be transformed by His amazing grace.
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-20 right-20 w-32 h-32 border border-amber-200/30 rounded-full"
+        />
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-20 left-20 w-24 h-24 border border-amber-300/20 rounded-full"
+        />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+        <motion.h1 
+          {...fadeInUp}
+          className="text-5xl md:text-7xl font-serif text-amber-900 dark:text-amber-100 mb-6"
+        >
+          <Image
+            src="/afikomen.png"
+            alt="The Afikomen Logo"
+            width={250}
+            height={200}
+            className="mx-auto block"
+            priority
+          />
+        </motion.h1>
+        <motion.p 
+          {...fadeInUp}
+          transition={{ delay: 0.2 }}
+          className="text-lg lg:text-xl text-orange-300 dark:text-orange-300 mb-8 dark:font-thin tracking-widest uppercase"
+        >
+          Hidden Redemption Revealed
+        </motion.p>
+        <motion.p 
+          {...fadeInUp}
+          transition={{ delay: 0.4 }}
+          className="text-md tracking-wider text-amber-500 font-light dark:text-orange-300 mb-12 max-w-2xl mx-auto leading-relaxed"
+        >
+          Discover the ancient Passover symbol <br />
+          that points to a greater story of redemption.
+        </motion.p>
+        <motion.button
+          {...fadeInUp}
+          transition={{ delay: 0.6 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+        >
+          Explore the Meaning
+        </motion.button>
+      </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+      >
+        <button
+          onClick={() => {
+            document.getElementById('what-is-afikomen')?.scrollIntoView({ 
+              behavior: 'smooth' 
+            })
+          }}
+          className="cursor-pointer hover:scale-110 transition-transform duration-200"
+          aria-label="Scroll to next section"
+        >
+          <ChevronDown className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+        </button>
+      </motion.div>
+    </section>
+  )
+}
+
+// What is Afikomen Section
+const WhatIsAfikomenSection = () => {
+  return (
+    <section id="what-is-afikomen" className="py-20 bg-gradient-to-b from-amber-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <div className="flex items-center justify-center mb-6">
+            <BookOpen className="w-8 h-8 text-orange-600 dark:text-amber-400 mr-4" />
+            <h2 className="text-3xl font-bold text-amber-600 dark:text-amber-400">What Is the Afikomen?</h2>
+          </div>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <motion.div
+            {...fadeInLeft}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <p className="text-lg font-light text-amber-600 dark:text-amber-400 leading-relaxed">
+              The <span className="font-bold">Afikomen</span> is a broken piece of matzah used in the Jewish Passover Seder. 
+              This sacred bread holds deep symbolic meaning that transcends its simple appearance.
+            </p>
+            <p className="text-lg font-light text-amber-600 dark:text-amber-400 leading-relaxed">
+              The word &quot;Afikomen&quot; comes from the Greek <em>&quot;epikomion&quot;</em>, meaning &quot;dessert&quot; or &quot;after-meal portion.&quot; 
+              Yet this humble piece of unleavened bread carries the weight of centuries of tradition and prophecy.
+            </p>
+            <div className="bg-amber-100 dark:bg-amber-200/20 p-6 rounded-lg border-l-4 border-amber-400">
+              <p className="text-amber-800 dark:text-amber-200 italic">
+                &quot;And you shall observe this thing as an ordinance for you and your sons forever.&quot;
+                <br />
+                <span className="text-sm">— Exodus 12:24</span>
               </p>
             </div>
+          </motion.div>
 
-            <div className="space-y-8">
-              <VerseForm onVerseProcessed={setCurrentResults} />
-              
-              {currentResults && (
-                <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-normal text-slate-600 dark:text-slate-200">Your Afikomen</h2>
-                    <CopyAllButton 
-                      reference={currentResults.reference}
-                      insight={currentResults.insight}
-                    />
-                  </div>
-                  <VerseResults
-                    reference={currentResults.reference}
-                    version={currentResults.version}
-                    insight={currentResults.insight}
-                  />
-                </div>
-              )}
-
-              {user && (
-                <RecentVerses showTitle={true} limit={3} />
-              )}
+          <motion.div
+            {...fadeInRight}
+            viewport={{ once: true }}
+            className="relative"
+          >
+            {/* Visual representation of three matzot */}
+            <div className="space-y-4">
+              <Image
+                src="/bread.png"
+                alt="The Afikomen Logo"
+                width={300}
+                height={200}
+                className="mx-auto block"
+                priority
+              />
             </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Afikomen App Section
+const AfikomenAppSection = () => {
+  return (
+    <section id="afikomen-app" className="py-20 bg-gradient-to-b from-white to-amber-50 dark:from-gray-800 dark:to-amber-900/10">
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl font-bold text-orange-400 dark:text-orange-400 mb-6">What is the Afikomen App?</h2>
+          <p className="text-lg text-orange-700 dark:text-orange-300 max-w-3xl mx-auto">
+            The Afikomen App is a tool that helps you understand God&apos;s word and how it is revealed through the Afikomen and its connection to the Bible.
+          </p>
+        </motion.div>
+
+        <div>
+          <motion.div
+            {...fadeInLeft}
+            viewport={{ once: true }}
+            className="p-8 rounded-lg flex flex-col lg:flex-row gap-4 justify-center items-start"
+          >
+            <Image 
+              src="/mobile-1.png"
+              alt="Mobile 1"
+              width={300}
+              height={200}
+              className="mx-auto block"
+              priority
+            />
+
+            <motion.div
+              className="flex flex-col gap- lg:w-1/2 w-full mt-8"
+            >
+
+              <motion.h2
+                {...fadeInRight}
+                viewport={{ once: true }}
+                className="text-xl font-semibold text-orange-400 dark:text-orange-300 mb-6"
+              >
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-500/50 text-white text-xl font-light flex-shrink-0">
+                    1
+                  </div>
+                  <span className="ml-3 text-2xl font-semibold text-orange-500 dark:text-orange-400">
+                    Create An Account
+                  </span>
+                </div>
+              </motion.h2>
+
+              <motion.p
+                {...fadeInRight}
+                viewport={{ once: true }}
+                className="text-lg text-amber-700 dark:text-white">
+                Create an account to get started. You will need to sign up with your email and create a password.
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        <div>
+          <motion.div
+            {...fadeInLeft}
+            viewport={{ once: true }}
+            className="p-8 rounded-lg flex flex-col lg:flex-row gap-4 justify-center items-start"
+          >
+            <motion.div
+              className="flex flex-col gap- lg:w-1/2 w-full mt-8"
+            >
+
+              <motion.h2
+                {...fadeInRight}
+                viewport={{ once: true }}
+                className="text-xl font-semibold text-orange-400 dark:text-orange-300 mb-6"
+              >
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-500/50 text-white text-xl font-light flex-shrink-0">
+                    2
+                  </div>
+                  <span className="ml-3 text-2xl font-semibold text-orange-500 dark:text-orange-400">
+                    Get the Insights of the verse you need
+                  </span>
+                </div>
+              </motion.h2>
+
+              <motion.p
+                {...fadeInRight}
+                viewport={{ once: true }}
+                className="text-lg text-amber-700 dark:text-white">
+                Get the insights by searching for a gospel and the verse you need.
+                Using the deep learning model of AI agent, it will give you the following: 
+              </motion.p>
+
+              <motion.ul className="text-lg text-amber-700 dark:text-white list-disc list-inside mt-8 list-style-circle">
+                <li className="mb-2">Full biblical context of the verse</li>
+                <li className="mb-2">Historical background</li>
+                <li className="mb-2">7-day bible actionable plan</li>
+                <li className="mb-2">Prayer points</li>
+                <li className="mb-2">Daily Bible verse</li>
+              </motion.ul>
+            </motion.div>
+            <Image 
+              src="/mobile-2.png"
+              alt="Mobile 2"
+              width={300}
+              height={200}
+              className="mx-auto block"
+              priority
+            />
+
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Start Your Journey Section
+const StartYourJourneySection = () => {
+  return (
+    <section id="reflection" className="py-20 bg-gradient-to-b from-amber-50 to-amber-100 dark:from-slate-200/20 dark:to-slate-300/20">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="space-y-8"
+        >
+          <h2 className="text-4xl font-semibold text-orange-400 dark:text-orange-400">Start Your Journey</h2>
+          
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
+            <Quote className="w-12 h-12 text-amber-600 dark:text-amber-400 mx-auto mb-6" />
+            <p className="text-xl text-amber-800 dark:text-amber-200 leading-relaxed mb-8">
+              &quot;The Afikomen reminds us that God&apos;s plan for redemption has always been hidden in plain sight, 
+              waiting to be revealed through Christ.&quot;
+            </p>
+            
+            <div className="bg-amber-100 dark:bg-amber-100/20 p-6 rounded-lg mb-8">
+              <p className="text-lg text-amber-900 dark:text-amber-100 font-medium mb-2">
+                &quot;For Christ, our Passover Lamb, has been sacrificed.&quot;
+              </p>
+              <p className="text-amber-700 dark:text-amber-300">— 1 Corinthians 5:7</p>
+            </div>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-amber-600 cursor-pointer duration-500 transition-all hover:bg-amber-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-lg hover:shadow-xl"
+            >
+              Create an Account & Start Your Journey Now!
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+// Main Landing Page Component
+export default function Home() {
+  return (
+    <>
+      <Head>
+        <title>The Afikomen: Hidden Redemption Revealed | Passover Symbol & Christian Connection</title>
+        <meta name="description" content="Discover the ancient Passover symbol of the Afikomen and its profound Christian connection. Learn about Jewish tradition, biblical symbolism, and how it points to Jesus Christ." />
+        <meta name="keywords" content="Afikomen, Passover, Jewish tradition, Christian symbolism, Jesus Christ, redemption, matzah, Seder" />
+        <meta name="author" content="The Afikomen Project" />
+        <meta property="og:title" content="The Afikomen: Hidden Redemption Revealed" />
+        <meta property="og:description" content="Discover the ancient Passover symbol that points to a greater story of redemption." />
+        <meta property="og:type" content="website" />
+      </Head>
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white dark:from-gray-900 dark:to-gray-800">
+
+      {/* Sticky Header */}
+      <StickyHeader />
+
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* What is Afikomen Section */}
+      <WhatIsAfikomenSection />
+
+
+      {/* Afikomen App Section */}
+      <AfikomenAppSection />
+
+      {/* Start Your Journey Section */}
+      <StartYourJourneySection />
+
+      {/* Footer */}
+      <footer className="bg-slate-900 dark:bg-gray-900 text-slate-100 dark:text-slate-200 py-12">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <div className="pt-6">
+            <p className="text-slate-300 dark:text-slate-400 text-xs uppercase font-thin tracking-widest">
+              © 2025 Afikomen. All rights reserved.
+            </p>
           </div>
         </div>
-      </main>
-      {/* <DebugAuth /> */}
-    </div>
+      </footer>
+      </div>
+    </>
   )
 }

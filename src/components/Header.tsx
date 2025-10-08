@@ -16,7 +16,7 @@ export default function Header() {
     <header className="bg-transparent py-4">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex lg:items-center gap-3 pt-5 cursor-pointer">
+          <Link href="/app" className="flex lg:items-center gap-3 pt-5 cursor-pointer">
             <Image 
               src="/afikomen.png" 
               alt="Afikomen Logo" 

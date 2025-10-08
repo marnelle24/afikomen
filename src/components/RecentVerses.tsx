@@ -146,13 +146,15 @@ export default function RecentVerses({ onVerseClick, showTitle = true, limit = 5
                   <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 font-light leading-relaxed">{verse.verseContent}</p>
                 </div>
                 
-                <div className="flex items-start gap-3 flex-shrink-0">
-                  <div className="flex items-start font-light text-[11px] italic text-slate-400 dark:text-slate-400">
-                    {verse.tokenUsed} tokens
-                  </div>
-                  <div className="flex items-center font-light text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-gray-600 px-3 py-1.5 rounded-full">
-                    <Calendar className="h-3 w-3 mr-1.5" />
-                    {formatDate(verse.createdAt)}
+                <div className="flex lg:items-start items-end lg:justify-between justify-between lg:w-auto w-full gap-3 flex-shrink-0">
+                  <div className="flex lg:flex-row flex-col items-start gap-3">
+                    <div className="flex items-start font-light text-[11px] italic text-slate-400 dark:text-slate-400">
+                      {verse.tokenUsed} tokens
+                    </div>
+                    <div className="flex items-center font-light text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-gray-600 px-3 py-1.5 rounded-full">
+                      <Calendar className="h-3 w-3 mr-1.5" />
+                      {formatDate(verse.createdAt)}
+                      </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-slate-400 dark:text-slate-500 group-hover:text-orange-500 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all duration-300" />
                 </div>
