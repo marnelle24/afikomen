@@ -49,7 +49,7 @@ export default function RegisterPage() {
           <h2 className="text-3xl font-extrabold text-slate-600 dark:text-slate-200">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-200">
+          <p className="mt-4 text-md tracking-wider font-light text-slate-600 dark:text-slate-200">
             Start your journey with Afikomen
           </p>
         </div>

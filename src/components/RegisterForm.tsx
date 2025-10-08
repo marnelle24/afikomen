@@ -123,7 +123,7 @@ export default function RegisterForm() {
           className="disabled:cursor-not-allowed disabled:bg-orange-600 cursor-pointer w-full flex font-regular hover:-translate-y-0.5 duration-300 uppercase tracking-widest justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:opacity-50"
         >
           {/* {loading ? 'Creating account...' : 'Create account'} */}
-          Registration is disabled...
+          Temporary disabled...
         </button>
       </form>
     </div>

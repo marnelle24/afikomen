@@ -10,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { 
   BookOpen, 
   ChevronDown,
-  Quote,
   Moon,
   Sun,
   LogIn,
@@ -227,8 +226,8 @@ const WhatIsAfikomenSection = () => {
           className="text-center mb-16"
         >
           <div className="flex items-center justify-center mb-6">
-            <BookOpen className="w-8 h-8 text-orange-600 dark:text-amber-400 mr-4" />
-            <h2 className="text-3xl font-bold text-amber-600 dark:text-amber-400">What Is the Afikomen?</h2>
+            <BookOpen className="w-8 h-8 text-orange-400 dark:text-orange-400 mr-4" />
+            <h2 className="text-3xl font-bold text-orange-400 dark:text-orange-400">What Is the Afikomen?</h2>
           </div>
         </motion.div>
 
@@ -238,11 +237,11 @@ const WhatIsAfikomenSection = () => {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <p className="text-lg font-light text-amber-600 dark:text-amber-400 leading-relaxed">
+            <p className="text-lg font-light text-orange-700 dark:text-orange-300 leading-relaxed">
               The <span className="font-bold">Afikomen</span> is a broken piece of matzah used in the Jewish Passover Seder. 
               This sacred bread holds deep symbolic meaning that transcends its simple appearance.
             </p>
-            <p className="text-lg font-light text-amber-600 dark:text-amber-400 leading-relaxed">
+            <p className="text-lg font-light text-orange-700 dark:text-orange-300 leading-relaxed">
               The word &quot;Afikomen&quot; comes from the Greek <em>&quot;epikomion&quot;</em>, meaning &quot;dessert&quot; or &quot;after-meal portion.&quot; 
               Yet this humble piece of unleavened bread carries the weight of centuries of tradition and prophecy.
             </p>
@@ -412,8 +411,7 @@ const StartYourJourneySection = () => {
           <h2 className="text-4xl font-semibold text-orange-400 dark:text-orange-400">Start Your Journey</h2>
           
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-            <Quote className="w-12 h-12 text-amber-600 dark:text-amber-400 mx-auto mb-6" />
-            <p className="text-xl text-amber-800 dark:text-amber-200 leading-relaxed mb-8">
+            <p className="text-xl text-orange-800 dark:text-orange-300 leading-relaxed mb-8">
               &quot;The Afikomen reminds us that God&apos;s plan for redemption has always been hidden in plain sight, 
               waiting to be revealed through Christ.&quot;
             </p>
