@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -24,6 +24,7 @@ export async function GET(
       )
     }
 
+    const params = await context.params
     const verse = await prisma.verse.findFirst({
       where: {
         id: params.id,
