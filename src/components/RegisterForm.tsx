@@ -26,6 +26,11 @@ export default function RegisterForm() {
       return
     }
 
+    console.log('Registration is temporarily disabled...')
+
+    setError('Registration is temporarily disabled...')
+    return
+
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
