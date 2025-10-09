@@ -52,7 +52,10 @@ export async function GET(request: NextRequest) {
     })
 
     // Calculate total tokens used across all verses
-    const totalTokensUsedInVerses = allVerses.reduce((total, verse) => total + ((verse as any).tokenUsed || 0), 0)
+    const totalTokensUsedInVerses = allVerses.reduce((total, verse) => {
+      const verseWithToken = verse as typeof verse & { tokenUsed?: number }
+      return total + (verseWithToken.tokenUsed || 0)
+    }, 0)
 
     // Calculate favorite version
     const versionCounts = allVerses.reduce((acc, verse) => {
