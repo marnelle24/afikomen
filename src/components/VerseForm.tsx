@@ -146,7 +146,7 @@ export default function VerseForm({ onVerseProcessed }: VerseFormProps) {
                 Processing your verse...
               </p>
               <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-                Generating insights with AI
+                Generating insights & formulating action plans
               </p>
             </div>
           </div>
