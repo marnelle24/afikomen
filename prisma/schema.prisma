@@ -20,7 +20,7 @@ model User {
   updatedAt DateTime @updatedAt
   
   // Token system for usage limits
-  tokenBalance    Int      @default(1000) // Monthly token allowance
+  tokenBalance    Int      @default(10000) // Monthly token allowance
   tokensUsed      Int      @default(0)   // Tokens consumed this month
   lastTokenReset  DateTime @default(now()) // When tokens were last reset
   
