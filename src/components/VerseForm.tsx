@@ -120,7 +120,7 @@ export default function VerseForm({ onVerseProcessed }: VerseFormProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-2 font-thin drop-shadow-md text-xl border border-transparent rounded-md shadow-sm cursor-pointer disabled:cursor-not-allowed text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:opacity-50 transition-colors"
+              className="w-full sm:w-auto px-6 py-2 drop-shadow-md text-xl border border-transparent rounded-md shadow-sm cursor-pointer disabled:cursor-not-allowed text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400 disabled:opacity-50 transition-colors"
             >
               {loading ? 'Processing...' : 'Reveal the word'}
             </button>
@@ -130,6 +130,25 @@ export default function VerseForm({ onVerseProcessed }: VerseFormProps) {
         {error && (
           <div className="text-orange-400 dark:text-orange-300 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3">
             {error}
+          </div>
+        )}
+
+        {loading && (
+          <div className="mt-6 flex flex-col items-center justify-center space-y-4">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-400"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-8 w-8 bg-orange-100 dark:bg-orange-900/20 rounded-full"></div>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-slate-600 dark:text-slate-300 font-medium animate-pulse">
+                Processing your verse...
+              </p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+                Generating insights with AI
+              </p>
+            </div>
           </div>
         )}
       </form>
