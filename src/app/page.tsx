@@ -77,7 +77,7 @@ const StickyHeader = () => {
               className="cursor-pointer rounded-md text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
               aria-label="Toggle dark mode"
             >
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? <Sun className="lg:h-5 lg:w-5 h-7 w-7" /> : <Moon className="lg:h-5 lg:w-5 h-7 w-7" />}
             </button>
             
             {!mounted ? (
@@ -89,7 +89,7 @@ const StickyHeader = () => {
                 className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                 title="Dashboard"
               >
-                <LayoutDashboard className="h-4 w-4" />
+                <LayoutDashboard className="lg:h-5 lg:w-5 h-7 w-7" />
                 <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Dashboard</span>
               </Link>
             ) : (
@@ -99,7 +99,7 @@ const StickyHeader = () => {
                   className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Login"
                 >
-                  <LogIn className="h-4 w-4" />
+                  <LogIn className="lg:h-5 lg:w-5 h-7 w-7" />
                   <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Login</span>
                 </Link>
 
@@ -108,7 +108,7 @@ const StickyHeader = () => {
                   className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Register"
                 >
-                  <UserPlus className="h-4 w-4" />
+                  <UserPlus className="lg:h-5 lg:w-5 h-7 w-7" />
                   <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Register</span>
                 </Link>
               </>

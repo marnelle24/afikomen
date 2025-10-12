@@ -34,7 +34,7 @@ export default function Header() {
                   className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Dashboard"
                 >
-                  <LayoutDashboard className="h-5 w-5" />
+                  <LayoutDashboard className="lg:h-5 lg:w-5 h-7 w-7" />
                   <span className="hidden lg:block">Dashboard</span>
                 </Link>
 
@@ -43,7 +43,7 @@ export default function Header() {
                   className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Profile"
                 >
-                  <UserCircle className="h-5 w-5" />
+                  <UserCircle className="lg:h-5 lg:w-5 h-7 w-7" />
                   <span className="hidden lg:block">Profile</span>
                 </Link>
 
@@ -53,7 +53,7 @@ export default function Header() {
                   className="cursor-pointer rounded-md text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   aria-label="Toggle dark mode"
                 >
-                  {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                  {isDark ? <Sun className="lg:h-5 lg:w-5 h-7 w-7" /> : <Moon className="lg:h-5 lg:w-5 h-7 w-7" />}
                 </button>
                 
                 <button
@@ -62,7 +62,7 @@ export default function Header() {
                   className="cursor-pointer text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
                   title="Logout"
                 >
-                  <Power className="h-5 w-5" />
+                  <Power className="lg:h-5 lg:w-5 h-7 w-7" />
                 </button>
               </div>
               <TokenDisplay />
