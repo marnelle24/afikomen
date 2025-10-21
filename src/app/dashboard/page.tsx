@@ -137,7 +137,7 @@ Prayer:
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
+              <div className="bg-gradient-to-r from-slate-200 via-white to-slate-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-light text-orange-500 dark:text-orange-300">Total Verses</p>
@@ -147,7 +147,7 @@ Prayer:
                 </div>
               </div>
 
-              <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
+              <div className="bg-gradient-to-r from-slate-200 via-white to-slate-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-light text-orange-500 dark:text-orange-300">This Week</p>
@@ -157,7 +157,7 @@ Prayer:
                 </div>
               </div>
 
-              <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
+              <div className="bg-gradient-to-r from-slate-200 via-white to-slate-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-lg shadow-lg border border-slate-300 dark:border-slate-700 p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-light text-orange-500 dark:text-orange-300">Token Usage</p>

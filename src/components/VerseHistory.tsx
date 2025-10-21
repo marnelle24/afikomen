@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { BookOpen, Calendar, Copy, Check, X, Sparkles, Heart, Target, ChevronRight, Search, Coins } from 'lucide-react'
+import { BookOpen, Calendar, Copy, Check, X, Sparkles, Heart, Target, ChevronRight, Search, Coins, ChevronLeft } from 'lucide-react'
 
 interface Verse {
   id: string
@@ -23,7 +23,10 @@ export default function VerseHistory() {
   const [selectedVerse, setSelectedVerse] = useState<Verse | null>(null)
   const [copied, setCopied] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const { token } = useAuth()
+
+  const ITEMS_PER_PAGE = 6
 
   const fetchVerses = React.useCallback(async () => {
     try {
@@ -49,6 +52,11 @@ export default function VerseHistory() {
       fetchVerses()
     }
   }, [token, fetchVerses])
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -118,6 +126,12 @@ Prayer:
     )
   })
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredVerses.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const paginatedVerses = filteredVerses.slice(startIndex, endIndex)
+
   return (
     <div className="space-y-6">
       <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
@@ -154,8 +168,9 @@ Prayer:
             )}
           </div>
         ) : (
-          <div className="space-y-3">
-            {filteredVerses.map((verse) => (
+          <>
+            <div className="space-y-3">
+              {paginatedVerses.map((verse) => (
               <div
                 key={verse.id}
                 className="group relative hover:-translate-y-1 hover:shadow-xl duration-300 transition-all border-l-4 border-orange-500 dark:border-orange-400 rounded-lg p-5 bg-white dark:bg-gray-700 hover:bg-orange-50 dark:hover:bg-gray-600 cursor-pointer overflow-hidden"
@@ -187,8 +202,73 @@ Prayer:
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-slate-200 dark:border-gray-600">
+                <div className="text-sm text-slate-500 dark:text-slate-400">
+                  Showing {startIndex + 1} to {Math.min(endIndex, filteredVerses.length)} of {filteredVerses.length} verses
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      // Show first page, last page, current page, and pages around current page
+                      const shouldShow = 
+                        page === 1 || 
+                        page === totalPages || 
+                        Math.abs(page - currentPage) <= 1
+                      
+                      if (!shouldShow) {
+                        // Show ellipsis for gaps
+                        if (page === 2 && currentPage > 4) {
+                          return <span key={`ellipsis-${page}`} className="px-2 text-slate-400">...</span>
+                        }
+                        if (page === totalPages - 1 && currentPage < totalPages - 3) {
+                          return <span key={`ellipsis-${page}`} className="px-2 text-slate-400">...</span>
+                        }
+                        return null
+                      }
+                      
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                            page === currentPage
+                              ? 'bg-orange-500 text-white'
+                              : 'text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-700 border border-slate-300 dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
