@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
-import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save, CheckCircle, Clock, User, Globe, Lock } from 'lucide-react'
+import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save, CheckCircle, Clock, Globe, Lock } from 'lucide-react'
 
 interface VerseData {
   id: string
@@ -27,6 +27,19 @@ interface VerseData {
   }
 }
 
+interface JournalEntry {
+  id: string
+  personalReflection: string
+  isPublic: boolean
+  createdAt: string
+  verse: {
+    id: string
+    reference: string
+    version: string
+    verseContent: string
+  }
+}
+
 export default function VersePage() {
   const params = useParams()
   const router = useRouter()
@@ -39,8 +52,30 @@ export default function VersePage() {
   const [isPublic, setIsPublic] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [journals, setJournals] = useState<any[]>([])
+  const [journals, setJournals] = useState<JournalEntry[]>([])
   const [loadingJournals, setLoadingJournals] = useState(false)
+
+  const fetchJournals = useCallback(async () => {
+    if (!params.id || !token) return
+
+    try {
+      setLoadingJournals(true)
+      const response = await fetch(`/api/journal?verseId=${params.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setJournals(data.journals || [])
+      }
+    } catch (error) {
+      console.error('Error fetching journals:', error)
+    } finally {
+      setLoadingJournals(false)
+    }
+  }, [params.id, token])
 
   useEffect(() => {
     const fetchVerse = async () => {
@@ -84,7 +119,7 @@ export default function VersePage() {
 
     fetchVerse()
     fetchJournals()
-  }, [params.id, token, user])
+  }, [params.id, token, user, fetchJournals])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -134,28 +169,6 @@ export default function VersePage() {
       console.error('Error saving journal:', error)
     } finally {
       setSaving(false)
-    }
-  }
-
-  const fetchJournals = async () => {
-    if (!params.id || !token) return
-
-    try {
-      setLoadingJournals(true)
-      const response = await fetch(`/api/journal?verseId=${params.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setJournals(data.journals || [])
-      }
-    } catch (error) {
-      console.error('Error fetching journals:', error)
-    } finally {
-      setLoadingJournals(false)
     }
   }
 
