@@ -39,7 +39,7 @@ A responsive web application where users can log in, input a Bible verse, and re
 
 ## Database Configuration
 
-This app supports both **MySQL** and **PostgreSQL** databases. You can switch between them using environment variables.
+This app supports both **MySQL** and **PostgreSQL** databases. To switch between them, simply update the `.env` file.
 
 ### Environment Variables
 
@@ -58,25 +58,29 @@ JWT_SECRET=your-super-secret-jwt-key-here
 OPENAI_API_KEY=your-openai-api-key-here
 ```
 
-### Environment Setup
+### Database Switching
 
-This project uses separate environment files for development and production:
+To switch between MySQL and PostgreSQL, manually update your `.env` file:
 
+**For MySQL:**
 ```bash
-# Development with MySQL
-npm run env:dev
-npm run dev
-
-# Production with PostgreSQL
-npm run env:prod
-npm run dev
-
-# Quick development with specific database
-npm run dev:mysql     # MySQL development
-npm run dev:postgres  # PostgreSQL development
+DATABASE_PROVIDER=mysql
+DATABASE_URL="mysql://username:password@host:port/database"
+DIRECT_URL="mysql://username:password@host:port/database"
 ```
 
-See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for detailed setup instructions.
+**For PostgreSQL:**
+```bash
+DATABASE_PROVIDER=postgresql
+DATABASE_URL="postgresql://username:password@host:port/database"
+DIRECT_URL="postgresql://username:password@host:port/database"
+```
+
+After changing the `.env` file, run:
+```bash
+npm run db:generate
+npm run db:push
+```
 
 ## Prerequisites
 

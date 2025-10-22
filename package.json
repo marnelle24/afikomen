@@ -11,12 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "setup": "npm run db:generate && npm run db:push",
-    "db:schema": "node scripts/generate-schema.js",
-    "env:dev": "node scripts/switch-env.js dev",
-    "env:prod": "node scripts/switch-env.js prod",
-    "dev:mysql": "npm run env:dev && npm run dev",
-    "dev:postgres": "npm run env:prod && npm run dev"
+    "setup": "npm run db:generate && npm run db:push"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
