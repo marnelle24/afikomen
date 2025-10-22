@@ -5,8 +5,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// mysql | postgresql
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
@@ -26,6 +27,7 @@ model User {
   lastTokenReset  DateTime @default(now()) // When tokens were last reset
   
   verses    Verse[]
+  journals  Journal[]
 }
 
 model Verse {
@@ -43,4 +45,19 @@ model Verse {
   
   userId            String
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  journals          Journal[]
+}
+
+model Journal {
+  id                String   @id @default(cuid())
+  personalReflection String  @db.Text
+  isPublic          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  verseId           String
+  verse             Verse    @relation(fields: [verseId], references: [id], onDelete: Cascade)
 }
