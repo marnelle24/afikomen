@@ -93,12 +93,7 @@ export const authRateLimit = createRateLimit({
   maxRequests: 5 // 5 login attempts per 15 minutes
 })
 
-export const verseRateLimit = createRateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  maxRequests: 10 // 10 verse requests per minute (reasonable for legitimate usage)
-})
-
-// Additional rate limiter for verse processing with longer window
+// Rate limiter for verse processing with longer window
 export const verseProcessingRateLimit = createRateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   maxRequests: 20 // 20 verse requests per 5 minutes (prevents abuse while allowing normal usage)

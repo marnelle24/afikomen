@@ -31,7 +31,7 @@ export default function VerseHistory() {
 
   const fetchVerses = React.useCallback(async () => {
     try {
-      const response = await apiClient.get('/api/verses', token)
+      const response = await apiClient.get('/api/verses', token || undefined)
 
       if (response.ok) {
         const data = await response.json()

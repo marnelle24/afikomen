@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generalRateLimit, authRateLimit, verseRateLimit, verseProcessingRateLimit, dataRateLimit } from '@/lib/rate-limit'
+import { generalRateLimit, authRateLimit, verseProcessingRateLimit, dataRateLimit } from '@/lib/rate-limit'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

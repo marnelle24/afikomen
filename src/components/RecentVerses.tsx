@@ -30,7 +30,7 @@ export default function RecentVerses({ showTitle = true, limit = 5 }: RecentVers
     if (!token) return
 
     try {
-      const response = await apiClient.get('/api/verses', token)
+      const response = await apiClient.get('/api/verses', token || undefined)
 
       if (response.ok) {
         const data = await response.json()

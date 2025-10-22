@@ -37,7 +37,7 @@ export default function DashboardPage() {
 
   const fetchDashboardStats = React.useCallback(async () => {
     try {
-      const response = await apiClient.get('/api/dashboard', token)
+      const response = await apiClient.get('/api/dashboard', token || undefined)
 
       if (response.ok) {
         const data = await response.json()
