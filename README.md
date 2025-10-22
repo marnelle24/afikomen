@@ -58,30 +58,25 @@ JWT_SECRET=your-super-secret-jwt-key-here
 OPENAI_API_KEY=your-openai-api-key-here
 ```
 
-### Quick Setup
+### Environment Setup
+
+This project uses separate environment files for development and production:
 
 ```bash
-# Interactive database setup
-npm run db:setup
+# Development with MySQL
+npm run env:dev
+npm run dev
 
-# Or quick setup for specific database
-npm run db:mysql      # For MySQL
-npm run db:postgres   # For PostgreSQL
+# Production with PostgreSQL
+npm run env:prod
+npm run dev
+
+# Quick development with specific database
+npm run dev:mysql     # MySQL development
+npm run dev:postgres  # PostgreSQL development
 ```
 
-### Easy Database Switching
-
-If you already have both MySQL and PostgreSQL configured, you can easily switch between them:
-
-```bash
-# Switch to MySQL
-DATABASE_PROVIDER=mysql npm run db:switch
-
-# Switch to PostgreSQL  
-DATABASE_PROVIDER=postgresql npm run db:switch
-```
-
-See [DATABASE_SWITCH.md](./DATABASE_SWITCH.md) for the simple switching guide.
+See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for detailed setup instructions.
 
 ## Prerequisites
 
