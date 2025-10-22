@@ -66,9 +66,27 @@ function switchToEnvironment(envFile) {
   
   log(`📋 Database provider: ${provider}`, 'info');
   
+  // Create .env.local with the environment variables for Next.js
+  const envLocalContent = Object.entries(envVars)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join('\n');
+  
+  fs.writeFileSync('.env.local', envLocalContent);
+  log('✅ Created .env.local with environment variables', 'success');
+  
+  // Set all environment variables from the env file
+  const env = { 
+    ...process.env, 
+    DATABASE_PROVIDER: provider,
+    DATABASE_URL: envVars.DATABASE_URL,
+    DIRECT_URL: envVars.DIRECT_URL,
+    JWT_SECRET: envVars.JWT_SECRET,
+    OPENAI_API_KEY: envVars.OPENAI_API_KEY,
+    BIBLE_API_KEY: envVars.BIBLE_API_KEY
+  };
+  
   // Generate schema for the provider
   try {
-    const env = { ...process.env, DATABASE_PROVIDER: provider };
     execSync('node scripts/generate-schema.js', { 
       stdio: 'inherit',
       env: env
@@ -81,7 +99,7 @@ function switchToEnvironment(envFile) {
   
   // Generate Prisma client
   try {
-    execSync('npx prisma generate', { stdio: 'inherit' });
+    execSync('npx prisma generate', { stdio: 'inherit', env: env });
     log('✅ Prisma client generated successfully', 'success');
   } catch (error) {
     log(`❌ Failed to generate Prisma client: ${error.message}`, 'error');
