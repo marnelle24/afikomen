@@ -30,12 +30,46 @@ A responsive web application where users can log in, input a Bible verse, and re
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS
 - **Backend**: Next.js API Routes
-- **Database**: MySQL with Prisma ORM
+- **Database**: MySQL or PostgreSQL with Prisma ORM
 - **Authentication**: JWT tokens
 - **Verse & AI Integration**: OpenAI GPT-4 (for both verse fetching and insights)
 - **Icons**: Lucide React
+
+## Database Configuration
+
+This app supports both **MySQL** and **PostgreSQL** databases. You can switch between them using environment variables.
+
+### Environment Variables
+
+```bash
+# Database provider - either "mysql" or "postgresql"
+DATABASE_PROVIDER=mysql
+
+# Database connection URL
+DATABASE_URL="your-database-connection-string"
+DIRECT_URL="your-database-connection-string"
+
+# JWT Secret for authentication
+JWT_SECRET=your-super-secret-jwt-key-here
+
+# OpenAI API Key
+OPENAI_API_KEY=your-openai-api-key-here
+```
+
+### Quick Setup
+
+```bash
+# Interactive database setup
+npm run db:setup
+
+# Or quick setup for specific database
+npm run db:mysql      # For MySQL
+npm run db:postgres   # For PostgreSQL
+```
+
+See [DATABASE_CONFIG.md](./DATABASE_CONFIG.md) for detailed configuration examples.
 
 ## Prerequisites
 
