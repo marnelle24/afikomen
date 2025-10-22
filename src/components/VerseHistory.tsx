@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { BookOpen, Calendar, ChevronRight, Search, Coins, ChevronLeft } from 'lucide-react'
+import { BookOpen, Calendar, ChevronRight, Search, ChevronLeft } from 'lucide-react'
 
 interface Verse {
   id: string

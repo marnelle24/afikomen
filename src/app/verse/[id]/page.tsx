@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import Header from '@/components/Header'
 import { ArrowLeft, Calendar, User, BookOpen, Heart, Share2, Edit3 } from 'lucide-react'
 
 interface VerseData {
@@ -19,6 +20,7 @@ interface VerseData {
   shortPrayer: string
   tokenUsed: number
   createdAt: string
+  userId: string
   user: {
     name: string
     email: string
@@ -28,16 +30,22 @@ interface VerseData {
 export default function VersePage() {
   const params = useParams()
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, token, loading: authLoading } = useAuth()
   const [verse, setVerse] = useState<VerseData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchVerse = async () => {
+      if (!params.id || !token) return
+      
       try {
         setLoading(true)
-        const response = await fetch(`/api/verse/${params.id}`)
+        const response = await fetch(`/api/verse/${params.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        })
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -51,7 +59,14 @@ export default function VersePage() {
         }
 
         const data = await response.json()
-        setVerse(data)
+        
+        // Check if the verse belongs to the current user
+        if (data.verse && user && data.verse.userId !== user.id) {
+          setError('Unauthorized access - This verse does not belong to you')
+          return
+        }
+        
+        setVerse(data.verse)
       } catch (err) {
         setError('Failed to load verse')
         console.error('Error fetching verse:', err)
@@ -60,10 +75,8 @@ export default function VersePage() {
       }
     }
 
-    if (params.id) {
-      fetchVerse()
-    }
-  }, [params.id])
+    fetchVerse()
+  }, [params.id, token])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -75,7 +88,14 @@ export default function VersePage() {
     })
   }
 
-  if (loading) {
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, authLoading, router])
+
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -84,6 +104,10 @@ export default function VersePage() {
         </div>
       </div>
     )
+  }
+
+  if (!user) {
+    return null // Will redirect to login
   }
 
   if (error) {
@@ -117,7 +141,9 @@ export default function VersePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
+      <Header />
+      
+      {/* Verse Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -162,14 +188,14 @@ export default function VersePage() {
               </div>
               <div className="flex items-center">
                 <User className="w-4 h-4 mr-1" />
-                {verse.user.name || verse.user.email}
+                {verse.user?.name || verse.user?.email || 'Unknown User'}
               </div>
             </div>
           </div>
           
           <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
             <p className="text-lg text-gray-800 dark:text-gray-200 italic">
-              "{verse.verseContent}"
+              &quot;{verse.verseContent}&quot;
             </p>
           </div>
         </div>

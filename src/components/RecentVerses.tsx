@@ -14,18 +14,6 @@ interface RecentVerse {
   tokenUsed: number
 }
 
-interface FullVerse {
-  id: string
-  reference: string
-  version: string
-  verseContent: string
-  context: string
-  modernReflection: string
-  weeklyActionPlan: Array<{ title: string; action: string }>
-  shortPrayer: string
-  createdAt: string
-}
-
 interface RecentVersesProps {
   showTitle?: boolean
   limit?: number
