@@ -13,6 +13,7 @@
     "db:studio": "prisma studio",
     "setup": "npm run db:generate && npm run db:push",
     "db:setup": "node scripts/setup-database.js",
+    "db:switch": "node scripts/switch-database.js",
     "db:mysql": "DATABASE_PROVIDER=mysql npm run db:generate && npm run db:push",
     "db:postgres": "DATABASE_PROVIDER=postgresql npm run db:generate && npm run db:push"
   },

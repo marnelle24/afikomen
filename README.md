@@ -69,7 +69,19 @@ npm run db:mysql      # For MySQL
 npm run db:postgres   # For PostgreSQL
 ```
 
-See [DATABASE_CONFIG.md](./DATABASE_CONFIG.md) for detailed configuration examples.
+### Easy Database Switching
+
+If you already have both MySQL and PostgreSQL configured, you can easily switch between them:
+
+```bash
+# Switch to MySQL
+DATABASE_PROVIDER=mysql npm run db:switch
+
+# Switch to PostgreSQL  
+DATABASE_PROVIDER=postgresql npm run db:switch
+```
+
+See [DATABASE_SWITCH.md](./DATABASE_SWITCH.md) for the simple switching guide.
 
 ## Prerequisites
 
