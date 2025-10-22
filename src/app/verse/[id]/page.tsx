@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
-import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save } from 'lucide-react'
+import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save, CheckCircle } from 'lucide-react'
 
 interface VerseData {
   id: string
@@ -38,6 +38,7 @@ export default function VersePage() {
   const [journalContent, setJournalContent] = useState('')
   const [isPublic, setIsPublic] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
     const fetchVerse = async () => {
@@ -114,7 +115,12 @@ export default function VersePage() {
         setShowJournalModal(false)
         setJournalContent('')
         setIsPublic(false)
-        // You could show a success message here
+        setShowSuccess(true)
+        
+        // Auto-hide success notification after 3 seconds
+        setTimeout(() => {
+          setShowSuccess(false)
+        }, 3000)
       } else {
         console.error('Failed to save journal')
       }
@@ -189,10 +195,10 @@ export default function VersePage() {
             Back
           </button>
           
-           <div className="flex items-center space-x-4">
+           <div className="flex items-center gap-2">
              <button 
                onClick={() => setShowJournalModal(true)}
-               className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors"
+               className="bg-gradient-to-r from-orange-300 to-orange-400 text-white hover:bg-gradient-to-l drop-shadow duration-500 hover:scale-105 transation-all border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex gap-1 text-center text-sm cursor-pointer p-2 dark:text-white hover:text-orange-100 transition-all"
              >
                <PenTool className="w-4 h-4" />
                Write My Journal
@@ -314,7 +320,7 @@ export default function VersePage() {
                   value={journalContent}
                   onChange={(e) => setJournalContent(e.target.value)}
                   placeholder="Share your thoughts, insights, and personal reflections about this verse..."
-                  className="w-full h-64 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
+                  className="w-full h-64 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-0 focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
                 />
               </div>
 
@@ -327,7 +333,7 @@ export default function VersePage() {
                   className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
                 />
                 <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  Make this journal entry public
+                  I want to make this journal public
                 </label>
               </div>
 
@@ -358,6 +364,25 @@ export default function VersePage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Notification */}
+      {showSuccess && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right duration-300">
+          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-sm">
+            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+            <div>
+              <p className="font-semibold">Journal Saved!</p>
+              <p className="text-sm text-green-100">Your reflection has been saved successfully.</p>
+            </div>
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="ml-2 text-green-200 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
