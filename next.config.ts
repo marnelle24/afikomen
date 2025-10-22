@@ -30,18 +30,8 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Request size limits
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
-  },
-
-  // API route configuration
-  api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
-    responseLimit: '8mb',
-  },
+  // External packages for server components
+  serverExternalPackages: ['@prisma/client'],
 };
 
 export default nextConfig;

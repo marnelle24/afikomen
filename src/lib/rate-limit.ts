@@ -26,7 +26,7 @@ export function createRateLimit(config: RateLimitConfig) {
   }> => {
     const key = identifier || getClientIP(request)
     const now = Date.now()
-
+    
     // Clean expired entries
     Object.keys(store).forEach(k => {
       if (store[k].resetTime < now) {
@@ -95,10 +95,22 @@ export const authRateLimit = createRateLimit({
 
 export const verseRateLimit = createRateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 3 // 3 verse requests per minute
+  maxRequests: 10 // 10 verse requests per minute (reasonable for legitimate usage)
+})
+
+// Additional rate limiter for verse processing with longer window
+export const verseProcessingRateLimit = createRateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  maxRequests: 20 // 20 verse requests per 5 minutes (prevents abuse while allowing normal usage)
 })
 
 export const generalRateLimit = createRateLimit({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 30 // 30 requests per minute
+  maxRequests: 120 // 120 requests per minute (very generous)
+})
+
+// Special rate limiter for dashboard/data endpoints
+export const dataRateLimit = createRateLimit({
+  windowMs: 10 * 1000, // 10 seconds
+  maxRequests: 50 // 50 data requests per 10 seconds (very generous for dashboard)
 })

@@ -7,6 +7,7 @@ import Header from '@/components/Header'
 import VerseHistory from '@/components/VerseHistory'
 import RecentVerses from '@/components/RecentVerses'
 import { BookOpen, TrendingUp, Coins } from 'lucide-react'
+import { apiClient } from '@/lib/api-client'
 
 // Helper function to format large numbers with K notation
 const formatTokenNumber = (num: number) => {
@@ -36,11 +37,7 @@ export default function DashboardPage() {
 
   const fetchDashboardStats = React.useCallback(async () => {
     try {
-      const response = await fetch('/api/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
+      const response = await apiClient.get('/api/dashboard', token)
 
       if (response.ok) {
         const data = await response.json()

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { BookOpen, Calendar, ChevronRight, Search, ChevronLeft } from 'lucide-react'
+import { apiClient } from '@/lib/api-client'
 
 interface Verse {
   id: string
@@ -30,11 +31,7 @@ export default function VerseHistory() {
 
   const fetchVerses = React.useCallback(async () => {
     try {
-      const response = await fetch('/api/verses', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
+      const response = await apiClient.get('/api/verses', token)
 
       if (response.ok) {
         const data = await response.json()

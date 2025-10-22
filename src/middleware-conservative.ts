@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generalRateLimit, authRateLimit, verseRateLimit, verseProcessingRateLimit, dataRateLimit } from '@/lib/rate-limit'
+import { generalRateLimit, authRateLimit, verseRateLimit, dataRateLimit } from '@/lib/rate-limit'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -17,11 +17,11 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/api/auth/')) {
     // Authentication endpoints - strictest limits
     rateLimitResult = await authRateLimit(request)
-  } else if (pathname === '/api/verse') {
-    // Verse processing endpoint - expensive AI operations (only the main POST endpoint)
-    rateLimitResult = await verseProcessingRateLimit(request)
-  } else if (pathname.startsWith('/api/dashboard') || pathname.startsWith('/api/verses') || pathname.startsWith('/api/verse/')) {
-    // Data endpoints - very generous limits for dashboard and verse lookups
+  } else if (pathname.startsWith('/api/verse') && !pathname.startsWith('/api/verses')) {
+    // Verse processing endpoint - expensive AI operations
+    rateLimitResult = await verseRateLimit(request)
+  } else if (pathname.startsWith('/api/dashboard') || pathname.startsWith('/api/verses')) {
+    // Data endpoints - very generous limits for dashboard
     rateLimitResult = await dataRateLimit(request)
   } else if (pathname.startsWith('/api/')) {
     // All other API endpoints - generous limits

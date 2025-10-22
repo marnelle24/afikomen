@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { BookOpen, Calendar, ChevronRight } from 'lucide-react'
+import { apiClient } from '@/lib/api-client'
 
 interface RecentVerse {
   id: string
@@ -29,11 +30,7 @@ export default function RecentVerses({ showTitle = true, limit = 5 }: RecentVers
     if (!token) return
 
     try {
-      const response = await fetch('/api/verses', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
+      const response = await apiClient.get('/api/verses', token)
 
       if (response.ok) {
         const data = await response.json()
