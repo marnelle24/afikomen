@@ -14,7 +14,6 @@
     "setup": "npm run db:generate && npm run db:push"
   },
   "dependencies": {
-    "@prisma/client": "^6.16.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.2",
@@ -23,18 +22,21 @@
     "lucide-react": "^0.544.0",
     "next": "15.5.4",
     "openai": "^6.1.0",
-    "prisma": "^6.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@prisma/client": "^6.18.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "i": "^0.3.7",
+    "npm": "^11.6.2",
+    "prisma": "^6.18.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
