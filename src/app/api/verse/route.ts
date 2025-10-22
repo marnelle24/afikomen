@@ -3,9 +3,18 @@ import { getUserFromToken, checkUserTokens, deductTokens } from '@/lib/auth'
 import { fetchBibleVerse } from '@/lib/bible-api'
 import { generateVerseInsight } from '@/lib/ai'
 import { prisma } from '@/lib/db'
+import { verseSchema, validateRequestSize, withTimeout } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate request size
+    if (!validateRequestSize(request, 1024)) { // 1KB max
+      return NextResponse.json(
+        { error: 'Request too large' },
+        { status: 413 }
+      )
+    }
+
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     
     if (!token) {
@@ -23,14 +32,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { reference, version } = await request.json()
-
-    if (!reference || !version) {
+    // Validate and sanitize input
+    const body = await request.json()
+    const validationResult = verseSchema.safeParse(body)
+    
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Reference and version are required' },
+        { 
+          error: 'Invalid input',
+          details: validationResult.error.errors
+        },
         { status: 400 }
       )
     }
+
+    const { reference, version } = validationResult.data
 
     // Check if user has sufficient tokens
     const tokenStatus = await checkUserTokens(user.id)
@@ -48,11 +64,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Fetch Bible verse using OpenAI
-    const verseData = await fetchBibleVerse(reference, version)
+    // Fetch Bible verse using OpenAI with timeout
+    const verseData = await withTimeout(
+      fetchBibleVerse(reference, version),
+      30000, // 30 second timeout
+      'Verse fetching timed out'
+    )
     
-    // Generate AI insights using the same verse text
-    const insight = await generateVerseInsight(verseData.text, verseData.reference, version)
+    // Generate AI insights using the same verse text with timeout
+    const insight = await withTimeout(
+      generateVerseInsight(verseData.text, verseData.reference, version),
+      60000, // 60 second timeout
+      'AI insight generation timed out'
+    )
 
     // Get actual token consumption from AI response
     const actualTokensUsed = insight.tokens_used
