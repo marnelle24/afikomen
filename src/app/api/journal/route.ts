@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const verseId = searchParams.get('verseId')
 
-    const whereClause: any = {
+    const whereClause: { userId: string; verseId?: string } = {
       userId: user.id
     }
 
