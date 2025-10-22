@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
-import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save, CheckCircle, Clock, User, Globe, Lock } from 'lucide-react'
 
 interface VerseData {
   id: string
@@ -39,6 +39,8 @@ export default function VersePage() {
   const [isPublic, setIsPublic] = useState(false)
   const [saving, setSaving] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [journals, setJournals] = useState<any[]>([])
+  const [loadingJournals, setLoadingJournals] = useState(false)
 
   useEffect(() => {
     const fetchVerse = async () => {
@@ -81,6 +83,7 @@ export default function VersePage() {
     }
 
     fetchVerse()
+    fetchJournals()
   }, [params.id, token, user])
 
   const formatDate = (dateString: string) => {
@@ -117,6 +120,9 @@ export default function VersePage() {
         setIsPublic(false)
         setShowSuccess(true)
         
+        // Refresh journals list
+        fetchJournals()
+        
         // Auto-hide success notification after 3 seconds
         setTimeout(() => {
           setShowSuccess(false)
@@ -128,6 +134,28 @@ export default function VersePage() {
       console.error('Error saving journal:', error)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const fetchJournals = async () => {
+    if (!params.id || !token) return
+
+    try {
+      setLoadingJournals(true)
+      const response = await fetch(`/api/journal?verseId=${params.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setJournals(data.journals || [])
+      }
+    } catch (error) {
+      console.error('Error fetching journals:', error)
+    } finally {
+      setLoadingJournals(false)
     }
   }
 
@@ -280,7 +308,7 @@ export default function VersePage() {
         </div>
 
         {/* Prayer */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Prayer
           </h2>
@@ -289,6 +317,86 @@ export default function VersePage() {
               {verse.shortPrayer}
             </p>
           </div>
+        </div>
+
+        {/* Journal Timeline */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+              <PenTool className="w-5 h-5 mr-2 text-orange-500" />
+              My Journal Entries
+            </h2>
+            <button 
+              onClick={() => setShowJournalModal(true)}
+              className="bg-gradient-to-r from-orange-300 to-orange-400 text-white hover:bg-gradient-to-l drop-shadow duration-500 hover:scale-105 transition-all border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex gap-1 text-center text-sm cursor-pointer"
+            >
+              <PenTool className="w-4 h-4" />
+              Add Entry
+            </button>
+          </div>
+
+          {loadingJournals ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-400"></div>
+            </div>
+          ) : journals.length === 0 ? (
+            <div className="text-center py-12">
+              <PenTool className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+              <p className="text-gray-500 dark:text-gray-400 mb-4">No journal entries yet</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">Start your spiritual journey by writing your first reflection</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {journals.map((journal, index) => (
+                <div key={journal.id} className="relative">
+                  {/* Timeline line */}
+                  {index < journals.length - 1 && (
+                    <div className="absolute left-6 top-12 w-0.5 h-full bg-gray-200 dark:bg-gray-600"></div>
+                  )}
+                  
+                  {/* Journal entry */}
+                  <div className="relative flex items-start space-x-4">
+                    {/* Timeline dot */}
+                    <div className="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-orange-500" />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {formatDate(journal.createdAt)}
+                            </span>
+                            <div className="flex items-center space-x-1">
+                              {journal.isPublic ? (
+                                <>
+                                  <Globe className="w-4 h-4 text-green-500" />
+                                  <span className="text-xs text-green-600 dark:text-green-400">Public</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Lock className="w-4 h-4 text-gray-400" />
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">Private</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="prose prose-sm max-w-none">
+                          <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            {journal.personalReflection}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -371,7 +479,7 @@ export default function VersePage() {
       {/* Success Notification */}
       {showSuccess && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right duration-300">
-          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-sm">
+          <div className="bg-green-500/70 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-sm">
             <CheckCircle className="w-5 h-5 flex-shrink-0" />
             <div>
               <p className="font-semibold">Journal Saved!</p>

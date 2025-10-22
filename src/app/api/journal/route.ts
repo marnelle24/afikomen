@@ -94,10 +94,20 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const { searchParams } = new URL(request.url)
+    const verseId = searchParams.get('verseId')
+
+    const whereClause: any = {
+      userId: user.id
+    }
+
+    // If verseId is provided, filter by that verse
+    if (verseId) {
+      whereClause.verseId = verseId
+    }
+
     const journals = await prisma.journal.findMany({
-      where: {
-        userId: user.id
-      },
+      where: whereClause,
       include: {
         verse: {
           select: {
