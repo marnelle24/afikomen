@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
-import { ArrowLeft, Calendar, User, BookOpen, Heart, Share2 } from 'lucide-react'
+import { ArrowLeft, Calendar, BookOpen, Heart, Share2, PenTool, X, Save } from 'lucide-react'
 
 interface VerseData {
   id: string
@@ -34,6 +34,10 @@ export default function VersePage() {
   const [verse, setVerse] = useState<VerseData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showJournalModal, setShowJournalModal] = useState(false)
+  const [journalContent, setJournalContent] = useState('')
+  const [isPublic, setIsPublic] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchVerse = async () => {
@@ -86,6 +90,39 @@ export default function VersePage() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const handleSaveJournal = async () => {
+    if (!journalContent.trim() || !user || !verse) return
+
+    try {
+      setSaving(true)
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          verseId: verse.id,
+          personalReflection: journalContent,
+          isPublic: isPublic
+        })
+      })
+
+      if (response.ok) {
+        setShowJournalModal(false)
+        setJournalContent('')
+        setIsPublic(false)
+        // You could show a success message here
+      } else {
+        console.error('Failed to save journal')
+      }
+    } catch (error) {
+      console.error('Error saving journal:', error)
+    } finally {
+      setSaving(false)
+    }
   }
 
   // Redirect to login if not authenticated
@@ -152,18 +189,19 @@ export default function VersePage() {
             Back
           </button>
           
-          <div className="flex items-center space-x-4">
-            {/* <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-              <Heart className="w-5 h-5" />
-            </button> */}
-            <button className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-              <Share2 className="w-4 h-4" />
-              Share
-            </button>
-            {/* <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-              <Edit3 className="w-5 h-5" />
-            </button> */}
-          </div>
+           <div className="flex items-center space-x-4">
+             <button 
+               onClick={() => setShowJournalModal(true)}
+               className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors"
+             >
+               <PenTool className="w-4 h-4" />
+               Write My Journal
+             </button>
+             <button className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+               <Share2 className="w-4 h-4" />
+               Share
+             </button>
+           </div>
         </div>
       </div>
 
@@ -247,6 +285,82 @@ export default function VersePage() {
           </div>
         </div>
       </div>
+
+      {/* Journal Modal */}
+      {showJournalModal && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                <PenTool className="w-5 h-5 mr-2 text-orange-500" />
+                Write Your Journal
+              </h2>
+              <button
+                onClick={() => setShowJournalModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Your Personal Reflection
+                </label>
+                <textarea
+                  value={journalContent}
+                  onChange={(e) => setJournalContent(e.target.value)}
+                  placeholder="Share your thoughts, insights, and personal reflections about this verse..."
+                  className="w-full h-64 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
+                />
+              </div>
+
+              <div className="flex items-center mb-6">
+                <input
+                  type="checkbox"
+                  id="isPublic"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  Make this journal entry public
+                </label>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end space-x-3">
+                <button
+                  onClick={() => setShowJournalModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveJournal}
+                  disabled={!journalContent.trim() || saving}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-colors"
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Journal
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
