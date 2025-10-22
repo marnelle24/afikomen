@@ -66,6 +66,26 @@ function saveEnvFile(envVars, lines) {
   fs.writeFileSync(envPath, newLines.join('\n'));
 }
 
+function updatePrismaSchema(provider) {
+  const schemaPath = path.join(process.cwd(), 'prisma', 'schema.prisma');
+  
+  if (!fs.existsSync(schemaPath)) {
+    log('❌ Prisma schema file not found', 'error');
+    process.exit(1);
+  }
+  
+  const schemaContent = fs.readFileSync(schemaPath, 'utf8');
+  
+  // Replace the provider in the datasource block
+  const updatedContent = schemaContent.replace(
+    /provider = "mysql"|provider = "postgresql"/,
+    `provider = "${provider}"`
+  );
+  
+  fs.writeFileSync(schemaPath, updatedContent);
+  log(`✅ Updated Prisma schema to use ${provider}`, 'success');
+}
+
 function main() {
   log('🔄 Database Switch Utility', 'info');
   log('========================', 'info');
@@ -109,6 +129,9 @@ function main() {
   // Update the environment variables
   envVars.DATABASE_URL = databaseUrl;
   envVars.DIRECT_URL = directUrl;
+  
+  // Update Prisma schema with the correct provider
+  updatePrismaSchema(provider);
   
   // Save the updated .env file
   saveEnvFile(envVars, lines);
