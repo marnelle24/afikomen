@@ -337,14 +337,14 @@ export default function VersePage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
               <PenTool className="w-5 h-5 mr-2 text-orange-500" />
-              My Journal Entries
+              My Journal & Personal Reflections
             </h2>
             <button 
               onClick={() => setShowJournalModal(true)}
               className="bg-gradient-to-r from-orange-300 to-orange-400 text-white hover:bg-gradient-to-l drop-shadow duration-500 hover:scale-105 transition-all border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex gap-1 text-center text-sm cursor-pointer"
             >
               <PenTool className="w-4 h-4" />
-              Add Entry
+              Add Another Reflection
             </button>
           </div>
 
