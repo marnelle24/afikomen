@@ -14,8 +14,9 @@
     "setup": "npm run db:generate && npm run db:push",
     "db:setup": "node scripts/setup-database.js",
     "db:switch": "node scripts/switch-database.js",
-    "db:mysql": "DATABASE_PROVIDER=mysql npm run db:generate && npm run db:push",
-    "db:postgres": "DATABASE_PROVIDER=postgresql npm run db:generate && npm run db:push"
+    "db:schema": "node scripts/generate-schema.js",
+    "db:mysql": "DATABASE_PROVIDER=mysql npm run db:schema && npm run db:push",
+    "db:postgres": "DATABASE_PROVIDER=postgresql npm run db:schema && npm run db:push"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",

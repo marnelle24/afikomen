@@ -67,23 +67,21 @@ function saveEnvFile(envVars, lines) {
 }
 
 function updatePrismaSchema(provider) {
-  const schemaPath = path.join(process.cwd(), 'prisma', 'schema.prisma');
+  // Use the schema generator to create the correct schema
+  const { execSync } = require('child_process');
   
-  if (!fs.existsSync(schemaPath)) {
-    log('❌ Prisma schema file not found', 'error');
+  try {
+    // Set the DATABASE_PROVIDER environment variable and run the schema generator
+    const env = { ...process.env, DATABASE_PROVIDER: provider };
+    execSync('node scripts/generate-schema.js', { 
+      stdio: 'inherit',
+      env: env
+    });
+    log(`✅ Generated Prisma schema for ${provider}`, 'success');
+  } catch (error) {
+    log('❌ Failed to generate Prisma schema', 'error');
     process.exit(1);
   }
-  
-  const schemaContent = fs.readFileSync(schemaPath, 'utf8');
-  
-  // Replace the provider in the datasource block
-  const updatedContent = schemaContent.replace(
-    /provider = "mysql"|provider = "postgresql"/,
-    `provider = "${provider}"`
-  );
-  
-  fs.writeFileSync(schemaPath, updatedContent);
-  log(`✅ Updated Prisma schema to use ${provider}`, 'success');
 }
 
 function main() {
