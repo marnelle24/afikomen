@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { BookOpen, Calendar, ChevronRight } from 'lucide-react'
 
@@ -26,15 +27,15 @@ interface FullVerse {
 }
 
 interface RecentVersesProps {
-  onVerseClick?: (verse: FullVerse) => void
   showTitle?: boolean
   limit?: number
 }
 
-export default function RecentVerses({ onVerseClick, showTitle = true, limit = 5 }: RecentVersesProps) {
+export default function RecentVerses({ showTitle = true, limit = 5 }: RecentVersesProps) {
   const { token } = useAuth()
   const [recentVerses, setRecentVerses] = useState<RecentVerse[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   const fetchRecentVerses = useCallback(async () => {
     if (!token) return
@@ -61,23 +62,8 @@ export default function RecentVerses({ onVerseClick, showTitle = true, limit = 5
     }
   }, [token, limit])
 
-  const fetchFullVerse = async (verseId: string) => {
-    if (!token || !onVerseClick) return
-
-    try {
-      const response = await fetch(`/api/verse/${verseId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        onVerseClick(data.verse)
-      }
-    } catch (error) {
-      console.error('Error fetching verse:', error)
-    }
+  const handleVerseClick = (verseId: string) => {
+    router.push(`/verse/${verseId}`)
   }
 
   const formatDate = (dateString: string) => {
@@ -131,7 +117,7 @@ export default function RecentVerses({ onVerseClick, showTitle = true, limit = 5
           {recentVerses.map((verse) => (
             <div
               key={verse.id}
-              onClick={() => fetchFullVerse(verse.id)}
+              onClick={() => handleVerseClick(verse.id)}
               className="group relative hover:-translate-y-1 hover:shadow-xl duration-300 transition-all border-l-4 border-orange-500 dark:border-orange-400 rounded-lg p-5 bg-white dark:bg-gray-700 hover:bg-orange-50 dark:hover:bg-gray-600 cursor-pointer overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-orange-100 dark:bg-orange-900/20 rounded-full -mr-12 -mt-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
