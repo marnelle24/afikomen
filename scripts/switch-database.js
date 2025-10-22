@@ -37,7 +37,10 @@ function loadEnvFile() {
     if (trimmed && !trimmed.startsWith('#')) {
       const [key, ...valueParts] = trimmed.split('=');
       if (key && valueParts.length > 0) {
-        envVars[key.trim()] = valueParts.join('=').trim();
+        let value = valueParts.join('=').trim();
+        // Remove surrounding quotes if present
+        value = value.replace(/^["']|["']$/g, '');
+        envVars[key.trim()] = value;
       }
     }
   });
@@ -59,9 +62,12 @@ function saveEnvFile(envVars, lines) {
     newLines.push(line);
   });
   
-  // Add the new DATABASE_URL and DIRECT_URL
-  newLines.push(`DATABASE_URL="${envVars.DATABASE_URL}"`);
-  newLines.push(`DIRECT_URL="${envVars.DIRECT_URL}"`);
+  // Add the new DATABASE_URL and DIRECT_URL (remove any existing quotes)
+  const cleanDatabaseUrl = envVars.DATABASE_URL.replace(/^["']|["']$/g, '');
+  const cleanDirectUrl = envVars.DIRECT_URL.replace(/^["']|["']$/g, '');
+  
+  newLines.push(`DATABASE_URL="${cleanDatabaseUrl}"`);
+  newLines.push(`DIRECT_URL="${cleanDirectUrl}"`);
   
   fs.writeFileSync(envPath, newLines.join('\n'));
 }
@@ -90,8 +96,8 @@ function main() {
   
   const { envVars, lines } = loadEnvFile();
   
-  // Check if DATABASE_PROVIDER is set
-  const provider = envVars.DATABASE_PROVIDER;
+  // Check if DATABASE_PROVIDER is set (prioritize environment variable over .env file)
+  const provider = process.env.DATABASE_PROVIDER || envVars.DATABASE_PROVIDER;
   if (!provider) {
     log('❌ DATABASE_PROVIDER not found in .env file', 'error');
     log('Please add: DATABASE_PROVIDER=mysql or DATABASE_PROVIDER=postgresql', 'info');
