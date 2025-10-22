@@ -26,7 +26,6 @@ export function createRateLimit(config: RateLimitConfig) {
   }> => {
     const key = identifier || getClientIP(request)
     const now = Date.now()
-    const windowStart = now - config.windowMs
 
     // Clean expired entries
     Object.keys(store).forEach(k => {
@@ -85,7 +84,7 @@ function getClientIP(request: NextRequest): string {
     return realIP
   }
   
-  return request.ip || 'unknown'
+  return 'unknown'
 }
 
 // Pre-configured rate limiters
