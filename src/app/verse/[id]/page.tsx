@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
-import { ArrowLeft, Calendar, User, BookOpen, Heart, Share2, Edit3 } from 'lucide-react'
+import { ArrowLeft, Calendar, User, BookOpen, Heart, Share2 } from 'lucide-react'
 
 interface VerseData {
   id: string
@@ -76,7 +76,7 @@ export default function VersePage() {
     }
 
     fetchVerse()
-  }, [params.id, token])
+  }, [params.id, token, user])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -142,54 +142,48 @@ export default function VersePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
-      
-      {/* Verse Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
+      <div className="max-w-4xl mx-auto px-4 mt-12">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
+          
+          <div className="flex items-center space-x-4">
+            {/* <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+              <Heart className="w-5 h-5" />
+            </button> */}
+            <button className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+              <Share2 className="w-4 h-4" />
+              Share
             </button>
-            
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                <Heart className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                <Share2 className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                <Edit3 className="w-5 h-5" />
-              </button>
-            </div>
+            {/* <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+              <Edit3 className="w-5 h-5" />
+            </button> */}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-2">
         {/* Verse Header */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex lg:flex-row flex-col items-start justify-start lg:justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 {verse.reference}
+                <span className="text-gray-600 dark:text-gray-200 ml-2">({verse.version})</span>
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mb-2">{verse.version}</p>
             </div>
-            <div className="text-right text-sm text-gray-500 dark:text-gray-400">
+            <div className="lg:text-right text-left text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center mb-1">
                 <Calendar className="w-4 h-4 mr-1" />
                 {formatDate(verse.createdAt)}
               </div>
-              <div className="flex items-center">
-                <User className="w-4 h-4 mr-1" />
-                {verse.user?.name || verse.user?.email || 'Unknown User'}
-              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic">{verse.tokenUsed} tokens used</p>
             </div>
           </div>
           
@@ -251,11 +245,6 @@ export default function VersePage() {
               {verse.shortPrayer}
             </p>
           </div>
-        </div>
-
-        {/* Footer Info */}
-        <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Tokens used: {verse.tokenUsed} | Created: {formatDate(verse.createdAt)}</p>
         </div>
       </div>
     </div>
