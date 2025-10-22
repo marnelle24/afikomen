@@ -34,14 +34,23 @@ DATABASE_PROVIDER=mysql npm run db:switch
 DATABASE_PROVIDER=postgresql npm run db:switch
 ```
 
-### Method 2: Manual Switch
+### Method 2: Generate Schema Only
+```bash
+# Generate MySQL schema
+DATABASE_PROVIDER=mysql npm run db:schema
+
+# Generate PostgreSQL schema
+DATABASE_PROVIDER=postgresql npm run db:schema
+```
+
+### Method 3: Manual Switch
 1. Edit your `.env` file and change `DATABASE_PROVIDER` to either `mysql` or `postgresql`
 2. Run the switch script:
 ```bash
 npm run db:switch
 ```
 
-### Method 3: Direct Environment Variable
+### Method 4: Direct Environment Variable
 ```bash
 # For MySQL
 DATABASE_PROVIDER=mysql npm run dev
