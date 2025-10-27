@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Search, Loader2, Sun, Moon, LayoutDashboard, LogIn, UserPlus } from 'lucide-react'
+import Image from 'next/image'
+import { Loader2, BookOpen } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useTheme } from '@/contexts/ThemeContext'
-import Header from '@/components/Header'
+// import Header from '@/components/Header'
 
 interface BibleVerse {
   book_id: string
@@ -25,89 +25,12 @@ interface BibleResponse {
   translation_note: string
 }
 
-// Sticky Header Component
-const StickyHeader = () => {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { isDark, toggleTheme } = useTheme()
-  const { user } = useAuth()
-
-  useEffect(() => {
-    setMounted(true)
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-transparent dark:bg-transparent backdrop-blur-md' 
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <nav className="flex items-center justify-end">
-          <div className="flex items-center space-x-4">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="cursor-pointer rounded-md text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              {isDark ? <Sun className="lg:h-5 lg:w-5 h-7 w-7" /> : <Moon className="lg:h-5 lg:w-5 h-7 w-7" />}
-            </button>
-            
-            {!mounted ? (
-              // Placeholder to prevent hydration mismatch
-              <div className="w-24 h-6"></div>
-            ) : user ? (
-              <Link
-                href="/dashboard"
-                className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
-                title="Dashboard"
-              >
-                <LayoutDashboard className="lg:h-5 lg:w-5 h-7 w-7" />
-                <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Dashboard</span>
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
-                  title="Login"
-                >
-                  <LogIn className="lg:h-5 lg:w-5 h-7 w-7" />
-                  <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Login</span>
-                </Link>
-
-                <Link
-                  href="/register"
-                  className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
-                  title="Register"
-                >
-                  <UserPlus className="lg:h-5 lg:w-5 h-7 w-7" />
-                  <span className="hidden sm:block text-xs font-semibold uppercase tracking-widest">Register</span>
-                </Link>
-              </>
-            )}
-          </div>
-        </nav>
-      </div>
-    </motion.header>
-  )
-}
-
 export default function BiblePage() {
   const [passage, setPassage] = useState('')
   const [loading, setLoading] = useState(false)
   const [bibleData, setBibleData] = useState<BibleResponse | null>(null)
   const [error, setError] = useState('')
+  const { loading: authLoading } = useAuth()
 
   const handleSearch = async () => {
     if (!passage.trim()) return
@@ -134,13 +57,36 @@ export default function BiblePage() {
     }
   }
 
+  // Show loading state while authentication is being verified
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-orange-500" />
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-800">
       {/* Sticky Header */}
-        <StickyHeader />
-        <Header />
+      {/* <StickyHeader /> */}
+      {/* <Header /> */}
       
-        <div className="container mx-auto px-4 lg:mt-20 mt-8">
+      <div className="container mx-auto h-screen px-4 py-8 flex flex-col justify-center items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="flex justify-center items-center mb-10"
+            >
+              <Link href="/app">
+                <Image src="/afikomen.png" alt="Afikomen Logo" width={180} height={40} style={{ width: "auto", height: "auto" }} />
+              </Link>
+            </motion.div>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -170,9 +116,9 @@ export default function BiblePage() {
                     className="bg-gradient-to-r from-gray-50 via-gray-100 to-gray-200/10 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 rounded-xl shadow-lg p-6 mb-8"
                 >
                     <div className="flex flex-col gap-1">
-                        <label htmlFor="passage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Search for a bible passage
-                            </label>
+                      {/* <label htmlFor="passage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Search for a bible passage
+                      </label> */}
                             <div className='flex lg:flex-row flex-col gap-2'>
                             <div className="flex w-full">
                                 <input
@@ -191,14 +137,15 @@ export default function BiblePage() {
                                     type='button'
                                     onClick={handleSearch}
                                     disabled={loading || !passage.trim()}
-                                    className="w-full px-6 justify-center items-center py-3 bg-orange-500 text-white rounded-lg cursor-pointer hover:bg-orange-600 focus:ring-1 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 transition-colors"
+                                    className="w-full font-light whitespace-nowrap px-3 justify-center items-center py-3.5 bg-orange-500 text-white rounded-lg cursor-pointer hover:bg-orange-600 focus:ring-1 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 transition-colors"
                                 >
                                     {loading ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
-                                    <Search className="w-4 h-4" />
+                                    // <Search className="w-4 h-4" />
+                                    <BookOpen className="w-5 h-5" />
                                     )}
-                                    {loading ? 'Searching...' : 'Search'}
+                                    {loading ? 'Searching...' : 'Show Passage'}
                                 </button>
                             </div>
                             </div>

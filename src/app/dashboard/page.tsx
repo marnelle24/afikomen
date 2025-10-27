@@ -51,8 +51,16 @@ export default function DashboardPage() {
   }, [token])
 
   useEffect(() => {
+    // Only redirect if we're sure there's no user and loading is complete
     if (!loading && !user) {
-      router.push('/')
+      // Double-check with localStorage as fallback
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.log('Dashboard: No user and no token, redirecting to main page')
+        router.push('/')
+      } else {
+        console.log('Dashboard: No user but token exists, waiting for auth to load')
+      }
     }
     if (user && token) {
       fetchDashboardStats()

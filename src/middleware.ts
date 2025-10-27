@@ -20,8 +20,8 @@ export async function middleware(request: NextRequest) {
   } else if (pathname === '/api/verse') {
     // Verse processing endpoint - expensive AI operations (only the main POST endpoint)
     rateLimitResult = await verseProcessingRateLimit(request)
-  } else if (pathname.startsWith('/api/dashboard') || pathname.startsWith('/api/verses') || pathname.startsWith('/api/verse/')) {
-    // Data endpoints - very generous limits for dashboard and verse lookups
+  } else if (pathname.startsWith('/api/dashboard') || pathname.startsWith('/api/verses') || pathname.startsWith('/api/verse/') || pathname.startsWith('/api/tokens')) {
+    // Data endpoints - very generous limits for dashboard, verse lookups, and token info
     rateLimitResult = await dataRateLimit(request)
   } else if (pathname.startsWith('/api/')) {
     // All other API endpoints - generous limits

@@ -18,8 +18,16 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState('')
 
   useEffect(() => {
+    // Only redirect if we're sure there's no user and loading is complete
     if (!loading && !user) {
-      router.push('/')
+      // Double-check with localStorage as fallback
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.log('Profile: No user and no token, redirecting to main page')
+        router.push('/')
+      } else {
+        console.log('Profile: No user but token exists, waiting for auth to load')
+      }
     }
     if (user) {
       setName(user.name || '')
