@@ -4,8 +4,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-export interface VerseInsight {
-  verse_content: string
+export interface BibleAIAnalysis {
+  reference: string
   context: string
   modern_reflection: string
   weekly_action_plan: Array<{
@@ -16,21 +16,29 @@ export interface VerseInsight {
   tokens_used: number
 }
 
-export async function generateVerseInsight(
-  verseText: string,
-  reference: string,
-  version: string
-): Promise<VerseInsight> {
+export async function generateAIAnalysis(data: {
+  reference: string
+  text: string
+  verses: Array<{
+    book_id: string
+    book_name: string
+    chapter: number
+    verse: number
+    text: string
+  }>
+  translation: string
+}): Promise<BibleAIAnalysis> {
   try {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error('OpenAI API key is not configured. Please add OPENAI_API_KEY to your .env file.')
     }
-    const systemPrompt = `You are a thoughtful Bible study assistant. Analyze the provided Bible verse and return a structured JSON response with the following format:
+
+    const systemPrompt = `You are a thoughtful Bible study assistant. Analyze the provided Bible passage and return a structured JSON response with the following format:
 
 {
-  "verse_content": "The exact verse text with verse numbers and separate each verse with a new line",
-  "context": "Brief historical and biblical context of this verse",
-  "modern_reflection": "How this verse applies to modern life and challenges",
+  "reference": "The Bible reference (e.g., John 3:16)",
+  "context": "Brief historical and biblical context of this passage",
+  "modern_reflection": "How this passage applies to modern life and challenges",
   "weekly_action_plan": [
     {"title": "Day 1: [Theme]", "action": "Specific action for Day 1"},
     {"title": "Day 2: [Theme]", "action": "Specific action for Day 2"},
@@ -40,15 +48,16 @@ export async function generateVerseInsight(
     {"title": "Day 6: [Theme]", "action": "Specific action for Day 6"},
     {"title": "Day 7: [Theme]", "action": "Specific action for Day 7"}
   ],
-  "short_prayer": "A brief, heartfelt prayer based on this verse"
+  "short_prayer": "A brief, heartfelt prayer based on this passage"
 }
 
 Guidelines:
 - Keep the weekly action plan practical and achievable
-- Each day should have a different theme related to the verse
+- Each day should have a different theme related to the passage
 - The prayer should be sincere and personal
 - Context should be historically accurate
-- Modern reflection should be relevant and encouraging`
+- Modern reflection should be relevant and encouraging
+- Consider the full passage context, not just individual verses`
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
@@ -56,7 +65,7 @@ Guidelines:
         { role: "system", content: systemPrompt },
         {
           role: "user",
-          content: `Please analyze this Bible verse: "${verseText}" from ${reference} (${version}). Provide insights in the requested JSON format.`
+          content: `Please analyze this Bible passage: "${data.text}" from ${data.reference} (${data.translation}). Provide insights in the requested JSON format.`
         }
       ],
       temperature: 0.7,
@@ -72,17 +81,18 @@ Guidelines:
     const tokensUsed = completion.usage?.total_tokens || 0
 
     // Parse the JSON response
-    const insight = JSON.parse(responseText) as Omit<VerseInsight, 'tokens_used'>
+    const analysis = JSON.parse(responseText) as Omit<BibleAIAnalysis, 'tokens_used'>
     
-    // Add token usage to the insight
-    const insightWithTokens: VerseInsight = {
-      ...insight,
+    // Add token usage to the analysis
+    const analysisWithTokens: BibleAIAnalysis = {
+      ...analysis,
       tokens_used: tokensUsed
     }
     
-    return insightWithTokens
+    return analysisWithTokens
   } catch (error) {
-    console.error('Error generating AI insight:', error)
-    throw new Error('Failed to generate verse insight')
+    console.error('Error generating AI analysis:', error)
+    throw new Error('Failed to generate Bible analysis')
   }
 }
+

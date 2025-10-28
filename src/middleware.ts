@@ -17,8 +17,8 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/api/auth/')) {
     // Authentication endpoints - strictest limits
     rateLimitResult = await authRateLimit(request)
-  } else if (pathname === '/api/verse') {
-    // Verse processing endpoint - expensive AI operations (only the main POST endpoint)
+  } else if (pathname.startsWith('/api/ai/') || pathname.startsWith('/api/verse/ai-save')) {
+    // AI processing endpoints - expensive AI operations
     rateLimitResult = await verseProcessingRateLimit(request)
   } else if (pathname.startsWith('/api/dashboard') || pathname.startsWith('/api/verses') || pathname.startsWith('/api/verse/') || pathname.startsWith('/api/tokens')) {
     // Data endpoints - very generous limits for dashboard, verse lookups, and token info

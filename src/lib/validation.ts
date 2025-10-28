@@ -29,17 +29,6 @@ export const registerSchema = z.object({
     .transform(name => name.trim())
 })
 
-export const verseSchema = z.object({
-  reference: z.string()
-    .min(1, 'Verse reference is required')
-    .max(200, 'Verse reference too long')
-    .regex(/^[a-zA-Z0-9\s:.,-]+$/, 'Invalid characters in verse reference')
-    .transform(ref => ref.trim()),
-  version: z.enum(['NIV', 'KJV', 'ESV'], {
-    errorMap: () => ({ message: 'Version must be NIV, KJV, or ESV' })
-  })
-})
-
 export const journalSchema = z.object({
   verseId: z.string()
     .min(1, 'Verse ID is required')
@@ -81,13 +70,6 @@ export function sanitizeString(input: string): string {
     .trim()
 }
 
-export function sanitizeVerseReference(input: string): string {
-  return input
-    .replace(/[<>'"&]/g, '') // Remove potentially dangerous characters
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim()
-}
-
 // Request size validation
 export function validateRequestSize(request: Request, maxSize: number = 1024 * 1024): boolean {
   const contentLength = request.headers.get('content-length')
@@ -97,16 +79,3 @@ export function validateRequestSize(request: Request, maxSize: number = 1024 * 1
   return true
 }
 
-// Timeout wrapper for async operations
-export function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  errorMessage: string = 'Operation timed out'
-): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
-    )
-  ])
-}

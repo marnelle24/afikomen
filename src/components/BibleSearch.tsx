@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Loader2, BookOpen } from 'lucide-react'
+import DigDeeper from './DigDeeper'
 
 interface BibleVerse {
   book_id: string
@@ -27,7 +28,9 @@ export default function BibleSearch() {
   const [bibleData, setBibleData] = useState<BibleResponse | null>(null)
   const [error, setError] = useState('')
 
-  const handleSearch = async () => {
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
     if (!passage.trim()) return
 
     setLoading(true)
@@ -62,10 +65,9 @@ export default function BibleSearch() {
         className="bg-gradient-to-r from-gray-50 via-gray-100 to-gray-200/10 dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 rounded-xl shadow-lg p-6 mb-8"
       >
         <div className="flex flex-col gap-1">
-          {/* <label htmlFor="passage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Search for a bible passage
-          </label> */}
-          <div className='flex lg:flex-row flex-col gap-2'>
+          <form
+            onSubmit={handleSearch}
+            className="flex lg:flex-row flex-col gap-3">
             <div className="flex w-full">
               <input
                 id="passage"
@@ -79,8 +81,7 @@ export default function BibleSearch() {
             </div>
             <div className="flex items-end">
               <button
-                type='button'
-                onClick={handleSearch}
+                type='submit'
                 disabled={loading || !passage.trim()}
                 className="w-full font-light whitespace-nowrap px-3 justify-center items-center py-3.5 bg-orange-500 text-white rounded-lg cursor-pointer hover:bg-orange-600 focus:ring-1 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex gap-2 transition-colors"
               >
@@ -92,7 +93,7 @@ export default function BibleSearch() {
                 {loading ? 'Searching...' : 'Show Passage'}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </motion.div>
 
@@ -117,10 +118,13 @@ export default function BibleSearch() {
         >
           {/* Header Info */}
           <div className="mb-6">
-            <h3 className="text-xl mb-2">
-              <span className="text-gray-800 dark:text-gray-200 font-light">{bibleData.reference ? 'Passage from the book of ' : ''}</span>
-              <span className="text-orange-500 dark:text-orange-400 font-bold">{bibleData.reference}</span>
-            </h3>
+            <div className="flex justify-between md:gap-0 gap-4 items-center mb-2">
+              <h3 className="text-xl">
+                <span className="text-gray-800 dark:text-gray-200 font-light md:text-lg text-base">{bibleData.reference ? 'Passage from the book of ' : ''}</span>
+                <span className="text-orange-500 dark:text-orange-400 font-bold md:text-lg text-base">{bibleData.reference}</span>
+              </h3>
+              <DigDeeper BibleData={bibleData} />
+            </div>
           </div>
 
           <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">

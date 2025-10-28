@@ -67,6 +67,50 @@ export default function VerseHistory() {
     router.push(`/verse/${verseId}`)
   }
 
+  const formatVerseContent = (verseContent: string | Array<{ v: number; t: string }>) => {
+    // Handle both string and array formats
+    let parsedContent: Array<{ v: number; t: string }>
+    let excerpt = '';
+
+    if (typeof verseContent === 'string') {
+      // Check if it looks like JSON (starts with [ or {)
+      const trimmed = verseContent.trim()
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+        try {
+          parsedContent = JSON.parse(verseContent);
+        } catch (error) {
+          console.error('Error parsing verse content:', error);
+          // If parsing fails, treat as plain text
+          return (
+            <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 font-light leading-relaxed">
+              &ldquo;{verseContent}&rdquo;
+            </p>
+          )
+        }
+      } else {
+        // If it doesn't look like JSON, treat as plain text
+        return (
+          <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 font-light leading-relaxed">
+            &ldquo;{verseContent}&rdquo;
+          </p>
+        )
+      }
+    } else {
+      parsedContent = verseContent;
+    }
+
+    // Create excerpt from parsed content
+    parsedContent.forEach((verseItem: { v: number; t: string }) => {
+      excerpt += `${verseItem.t} `;
+    });
+
+    return (
+      <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 font-light leading-relaxed">
+        &ldquo;{excerpt.trim()}&rdquo;
+      </p>
+    )
+  }
+
   if (loading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
@@ -149,7 +193,7 @@ export default function VerseHistory() {
                       <h3 className="font-semibold text-slate-700 dark:text-slate-100">{verse.reference}</h3>
                       <span className="text-xs px-2 py-0.5 bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-full font-medium">{verse.version}</span>
                     </div>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 font-light leading-relaxed">{verse.verseContent}</p>
+                      {formatVerseContent(verse.verseContent)}
                   </div>
                   
                   <div className="flex lg:items-start items-end lg:justify-between justify-between lg:w-auto w-full gap-3 flex-shrink-0">

@@ -1,93 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Copy, Check } from 'lucide-react'
+import React from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
-import VerseForm from '@/components/VerseForm'
-import VerseResults from '@/components/VerseResults'
 import RecentVerses from '@/components/RecentVerses'
-
-interface CopyAllButtonProps {
-  reference: string;
-  insight: {
-    verse_content: string;
-    context: string;
-    modern_reflection: string;
-    weekly_action_plan: Array<{ title: string; action: string }>;
-    short_prayer: string;
-  };
-}
-
-function CopyAllButton({ reference, insight }: CopyAllButtonProps) {
-  const [copied, setCopied] = useState(false)
-
-  const copyAllContent = async () => {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    
-    const formattedContent = `${reference}
-
-Verse:
-"${insight.verse_content}"
-
-Context:
-${insight.context}
-
-Reflection:
-${insight.modern_reflection}
-
-7-Day Action Plan:
-${insight.weekly_action_plan.map((day, index) => `${days[index]}: ${day.title}\n${day.action}`).join('\n\n')}
-
-Prayer:
-"${insight.short_prayer}"`
-
-    try {
-      await navigator.clipboard.writeText(formattedContent)
-      setCopied(true)
-      setTimeout(() => {
-        setCopied(false)
-      }, 2000)
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
-    }
-  }
-
-  return (
-    <button
-      onClick={copyAllContent}
-      className="cursor-pointer flex items-center gap-2 px-4 py-2 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-800/50 transition-all duration-200 font-medium shadow-sm hover:shadow"
-    >
-      {copied ? (
-        <>
-          <Check className="h-3 w-3" />
-          Copied!
-        </>
-      ) : (
-        <>
-          <Copy className="h-3 w-3" />
-          Copy All
-        </>
-      )}
-    </button>
-  )
-}
 
 export default function AppPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [currentResults, setCurrentResults] = useState<{
-    reference: string;
-    version: string;
-    insight: {
-      verse_content: string;
-      context: string;
-      modern_reflection: string;
-      weekly_action_plan: Array<{ title: string; action: string }>;
-      short_prayer: string;
-    };
-  } | null>(null)
 
   // Redirect to login if not logged in
   React.useEffect(() => {
@@ -125,25 +46,6 @@ export default function AppPage() {
             </div>
 
             <div className="space-y-8">
-              <VerseForm onVerseProcessed={setCurrentResults} />
-              
-              {currentResults && (
-                <div className="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-normal text-slate-600 dark:text-slate-200">Your Afikomen</h2>
-                    <CopyAllButton 
-                      reference={currentResults.reference}
-                      insight={currentResults.insight}
-                    />
-                  </div>
-                  <VerseResults
-                    reference={currentResults.reference}
-                    version={currentResults.version}
-                    insight={currentResults.insight}
-                  />
-                </div>
-              )}
-
               {user && (
                 <RecentVerses showTitle={true} limit={3} />
               )}

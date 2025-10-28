@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
-import { Power, Moon, Sun, LayoutDashboard, UserCircle, LogIn } from 'lucide-react'
+import { Power, Moon, Sun, LayoutDashboard, UserCircle, LogIn, UserPlus } from 'lucide-react'
 
 export default function Navigation() {
   const { user, logout, loading } = useAuth()
@@ -60,14 +60,25 @@ export default function Navigation() {
         </>
       ) : (
         // Non-authenticated User Navigation
-        <Link
-          href="/login"
-          className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
-          title="Login"
-        >
-          <LogIn className="lg:h-5 lg:w-5 h-7 w-7" />
-          <span className="hidden lg:block">Login</span>
-        </Link>
+        <>
+          <Link
+            href="/login"
+            className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
+            title="Login"
+          >
+            <LogIn className="lg:h-5 lg:w-5 h-7 w-7" />
+            <span className="hidden lg:block uppercase font-light tracking-wider">Login</span>
+          </Link>
+          <Link
+            href="/register"
+            className="cursor-pointer flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-200 hover:text-orange-400 dark:hover:text-orange-300 transition-colors"
+            title="Register"
+          >
+            <UserPlus className="lg:h-5 lg:w-5 h-7 w-7" />
+            <span className="hidden lg:block uppercase font-light tracking-wider">Register</span>
+          </Link>
+        </>
+        
       )}
     </div>
   )

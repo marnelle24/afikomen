@@ -138,9 +138,11 @@ npm run db:push
 - `POST /api/auth/login` - User login
 - `GET /api/auth/me` - Get current user info
 
-### Verses
-- `POST /api/verse` - Process a Bible verse and generate insights
+### Verses & AI Analysis
+- `POST /api/ai/analyze` - Generate AI analysis for Bible passages
+- `POST /api/verse/ai-save` - Save AI-generated verse analysis
 - `GET /api/verses` - Get user's saved verses
+- `GET /api/verse/[id]` - Get specific verse details
 
 ## Usage
 
@@ -173,15 +175,16 @@ src/
 │   ├── Header.tsx         # Navigation header
 │   ├── LoginForm.tsx      # Login form
 │   ├── RegisterForm.tsx   # Registration form
-│   ├── VerseForm.tsx      # Verse input form
-│   ├── VerseResults.tsx   # Results display
+│   ├── BibleSearch.tsx    # Bible search component
+│   ├── DigDeeper.tsx      # AI analysis component
+│   ├── RecentVerses.tsx   # Recent verses component
 │   └── VerseHistory.tsx   # History component
 ├── contexts/              # React contexts
 │   └── AuthContext.tsx    # Authentication context
 └── lib/                   # Utility libraries
     ├── ai.ts              # OpenAI integration
     ├── auth.ts            # Authentication utilities
-    ├── bible-api.ts       # Bible API integration
+    ├── api-client.ts      # API client utilities
     └── db.ts              # Database connection
 ```
 

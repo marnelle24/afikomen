@@ -10,7 +10,10 @@ interface VerseData {
   id: string
   reference: string
   version: string
-  verseContent: string
+  verseContent: string | Array<{
+    v: number
+    t: string
+  }>
   context: string
   modernReflection: string
   weeklyActionPlan: Array<{
@@ -36,7 +39,10 @@ interface JournalEntry {
     id: string
     reference: string
     version: string
-    verseContent: string
+    verseContent: string | Array<{
+      v: number
+      t: string
+    }>
   }
 }
 
@@ -108,7 +114,30 @@ export default function VersePage() {
           return
         }
         
-        setVerse(data.verse)
+        // Parse JSON strings for weeklyActionPlan and verseContent with proper validation
+        const parseJsonSafely = (value: unknown) => {
+          if (typeof value === 'string') {
+            // Check if it looks like JSON (starts with [ or {)
+            const trimmed = value.trim()
+            if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+              try {
+                return JSON.parse(value)
+              } catch (error) {
+                console.error('Failed to parse JSON:', error)
+                return value // Return original string if parsing fails
+              }
+            }
+            return value // Return as string if it doesn't look like JSON
+          }
+          return value // Return as-is if not a string
+        }
+
+        const parsedVerse = {
+          ...data.verse,
+          weeklyActionPlan: parseJsonSafely(data.verse.weeklyActionPlan),
+          verseContent: parseJsonSafely(data.verse.verseContent)
+        }
+        setVerse(parsedVerse)
       } catch (err) {
         setError('Failed to load verse')
         console.error('Error fetching verse:', err)
@@ -129,6 +158,65 @@ export default function VersePage() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const formatVerseContent = (verseContent: string | Array<{ v: number; t: string }>) => {
+
+    // Check if verseContent is a string and contains JSON-like structure (curly braces)
+    if (typeof verseContent === 'string') {
+      if (verseContent.includes('{') && verseContent.includes('}')) { 
+        try {
+          // Try to parse as JSON array
+          const parsedContent = JSON.parse(verseContent) as Array<{ v: number; t: string }>
+          return (
+            <p className="text-lg text-gray-800 dark:text-gray-200 leading-relaxed">
+              {parsedContent.map((verseItem, index) => (
+                <span key={index} className="flex gap-2 items-start mb-2">
+                  <span className="text-lg text-orange-500 dark:text-orange-400 font-light italic"><sup>{verseItem.v}</sup></span>
+                  <span className="text-md text-gray-800 dark:text-gray-200 leading-relaxed">{verseItem.t}</span>
+                </span>
+              ))}
+            </p>
+          )
+        } catch (error) {
+          // If parsing fails, display as plain text
+          console.error('Error parsing verse content:', error);
+          return (
+            <p className="text-lg text-gray-800 dark:text-gray-200 leading-relaxed">
+              &ldquo;{verseContent}&rdquo;
+            </p>
+          )
+        }
+      }
+      else {
+        return (
+          <p className="text-lg text-gray-800 dark:text-gray-200 leading-relaxed">
+            &ldquo;{verseContent}&rdquo;
+          </p>
+        )
+      }
+    }
+    
+    // Handle array format directly
+    if (Array.isArray(verseContent)) {
+      return (
+        <p className="text-lg text-gray-800 dark:text-gray-200 leading-relaxed">
+          {verseContent.map((verseItem, index) => (
+            <span key={index} className="flex gap-2 items-start mb-2">
+              <span className="text-lg text-orange-500 dark:text-orange-400 font-light italic"><sup>{verseItem.v}</sup></span>
+              <span className="text-md text-gray-800 dark:text-gray-200 leading-relaxed">{verseItem.t}</span>
+            </span>
+          ))}
+        </p>
+      )
+    }
+    
+    // Handle plain string
+    return (
+      <p className="text-lg text-gray-800 dark:text-gray-200 leading-relaxed">
+        &ldquo;{verseContent}&rdquo;
+      </p>
+    )
   }
 
   const handleSaveJournal = async () => {
@@ -260,7 +348,7 @@ export default function VersePage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 {verse.reference}
-                <span className="text-gray-600 dark:text-gray-200 ml-2">({verse.version})</span>
+                {/* <span className="text-gray-600 dark:text-gray-200 ml-2">({verse.version})</span> */}
               </h1>
             </div>
             <div className="lg:text-right text-left text-sm text-gray-500 dark:text-gray-400">
@@ -273,9 +361,7 @@ export default function VersePage() {
           </div>
           
           <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-            <p className="text-lg text-gray-800 dark:text-gray-200 italic">
-              &quot;{verse.verseContent}&quot;
-            </p>
+            {formatVerseContent(verse.verseContent)}
           </div>
         </div>
 
@@ -308,7 +394,7 @@ export default function VersePage() {
           </h2>
           <div className="space-y-4">
             {verse.weeklyActionPlan.map((day, index) => (
-              <div key={index} className="border-l-4 border-orange-500 pl-4 py-2">
+              <div key={index} className="border-l-4 border-orange-500 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 pl-4 py-2">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
                   {day.title}
                 </h3>
