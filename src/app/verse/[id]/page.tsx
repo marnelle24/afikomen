@@ -329,8 +329,8 @@ export default function VersePage() {
                onClick={() => setShowJournalModal(true)}
                className="bg-gradient-to-r from-orange-300 to-orange-400 text-white hover:bg-gradient-to-l drop-shadow duration-500 hover:scale-105 transation-all border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex gap-1 text-center text-sm cursor-pointer p-2 dark:text-white hover:text-orange-100 transition-all"
              >
-               <PenTool className="w-4 h-4" />
-               Write My Journal
+              <PenTool className="w-4 h-4" />
+              My Reflection
              </button>
              <button className="flex gap-1 text-center text-sm cursor-pointer p-2 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
                <Share2 className="w-4 h-4" />
@@ -380,7 +380,7 @@ export default function VersePage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <Heart className="w-5 h-5 mr-2 text-orange-500" />
-            Modern Reflection
+            Reflection
           </h2>
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
             {verse.modernReflection}
@@ -420,9 +420,9 @@ export default function VersePage() {
 
         {/* Journal Timeline */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-              <PenTool className="w-5 h-5 mr-2 text-orange-500" />
+          <div className="flex lg:gap-0 gap-4 lg:flex-row flex-col items-center lg:justify-between justify-center mb-6">
+            <h2 className="lg:text-xl text-base font-semibold text-gray-900 dark:text-white flex items-start">
+              <div className="w-5 h-5 mr-2 text-orange-500 flex items-start"><PenTool /></div>
               My Journal & Personal Reflections
             </h2>
             <button 
@@ -430,7 +430,7 @@ export default function VersePage() {
               className="bg-gradient-to-r from-orange-300 to-orange-400 text-white hover:bg-gradient-to-l drop-shadow duration-500 hover:scale-105 transition-all border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex gap-1 text-center text-sm cursor-pointer"
             >
               <PenTool className="w-4 h-4" />
-              Add Another Reflection
+              Add Reflection
             </button>
           </div>
 

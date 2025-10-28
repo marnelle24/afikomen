@@ -56,8 +56,8 @@ export default function DigDeeper({BibleData}: DigDeeperProps) {
     if (user) {
       // User is logged in - handle AI feature
       setIsGenerating(true)
-      console.log('User is logged in, AI feature activated')
-      console.log('Bible Data:', BibleData)
+      // console.log('User is logged in, AI feature activated')
+      // console.log('Bible Data:', BibleData)
       
       try {
         // Call the API route for AI analysis
@@ -79,7 +79,7 @@ export default function DigDeeper({BibleData}: DigDeeperProps) {
         }
 
         const aiResponse = await response.json()
-        console.log('AI Analysis Response:', aiResponse)
+        // console.log('AI Analysis Response:', aiResponse)
 
         // Save the verse to database
         // Create a minimal verse content from the Bible data
@@ -88,7 +88,8 @@ export default function DigDeeper({BibleData}: DigDeeperProps) {
           t: verse.text
         }))
         
-        console.log('About to call /api/verse/ai-save endpoint')
+        // console.log('About to call /api/verse/ai-save endpoint')
+
         const saveResponse = await fetch('/api/verse/ai-save', {
           method: 'POST',
           headers: {
@@ -96,7 +97,7 @@ export default function DigDeeper({BibleData}: DigDeeperProps) {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
           body: JSON.stringify({
-            reference: aiResponse.reference,
+            reference: BibleData.reference.trim(),
             version: 'WEB',
             verseContent: JSON.stringify(minimalVerses),
             context: aiResponse.context,
@@ -114,7 +115,7 @@ export default function DigDeeper({BibleData}: DigDeeperProps) {
         }
 
         const savedVerse = await saveResponse.json()
-        console.log('Verse saved:', savedVerse)
+        // console.log('Verse saved:', savedVerse)
 
         // Redirect to the verse page
         router.push(`/verse/${savedVerse.verse.id}`)
@@ -195,6 +196,67 @@ export default function DigDeeper({BibleData}: DigDeeperProps) {
             <div className="absolute top-full md:left-1/2 left-56 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-16 border-transparent border-t-gray-900 dark:border-t-gray-300"></div>
           </motion.div>
         )}
+
+        {/* Loading Dialog */}
+        <AnimatePresence>
+          {isGenerating && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+              // No onClick handler - makes it uninterruptible
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-sm mx-4 shadow-2xl"
+                // No onClick stopPropagation - dialog content is also unclickable
+              >
+                <div className="flex flex-col items-center text-center space-y-6">
+                  {/* Loading Animation */}
+                  <div className="relative">
+                    <div className="w-16 h-16 border-4 border-orange-200 dark:border-orange-800 rounded-full animate-spin">
+                      <div className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-orange-500 rounded-full animate-spin"></div>
+                    </div>
+                    <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-orange-500 animate-pulse" />
+                  </div>
+                  
+                  {/* Loading Text */}
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                      Generating...
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      Please wait while we analyze the context of the passage, generate reflection and create a 7-day action plan...
+                    </p>
+                  </div>
+                  
+                  {/* Animated Dots */}
+                  <div className="flex space-x-1">
+                    <motion.div
+                      className="w-2 h-2 bg-orange-500 rounded-full"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                    />
+                    <motion.div
+                      className="w-2 h-2 bg-orange-500 rounded-full"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                    />
+                    <motion.div
+                      className="w-2 h-2 bg-orange-500 rounded-full"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Login Dialog */}
         <AnimatePresence>
