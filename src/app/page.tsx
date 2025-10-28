@@ -42,7 +42,7 @@ const BibleSearchSection = () => {
   const { y, opacity } = useScrollAnimation()
 
   return (
-    <section id="bibleSearch" className="relative py-20 flex items-center justify-center overflow-hidden">
+    <section id="bibleSearch" className="relative md:py-20 py-8 flex items-center justify-center overflow-hidden">
       {/* Background with parallax effect */}
       <motion.div 
         style={{ y, opacity }}
@@ -63,7 +63,7 @@ const BibleSearchSection = () => {
         />
       </div>
 
-      <div className="container mx-auto px-4 py-8 flex flex-col justify-center items-center z-50">
+      <div className="container mx-auto px-4 flex flex-col justify-center items-center z-50">
         {/* Header Section */}
         <motion.div 
           {...fadeInUp}
@@ -361,12 +361,12 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>The Afikomen: Hidden Redemption Revealed | Passover Symbol & Christian Connection</title>
-        <meta name="description" content="Discover the ancient Passover symbol of the Afikomen and its profound Christian connection. Learn about Jewish tradition, biblical symbolism, and how it points to Jesus Christ." />
-        <meta name="keywords" content="Afikomen, Passover, Jewish tradition, Christian symbolism, Jesus Christ, redemption, matzah, Seder" />
-        <meta name="author" content="The Afikomen Project" />
-        <meta property="og:title" content="The Afikomen: Hidden Redemption Revealed" />
-        <meta property="og:description" content="Discover the ancient Passover symbol that points to a greater story of redemption." />
+        <title>The Afikomen: Your one stop bible resource & guidance to your daily spiritual life</title>
+        <meta name="description" content="Your simplified bible resource to search and read Bible passages from the modern & simplified world english translation. Get the insights of the verse you need with the Afikomen App." />
+        <meta name="keywords" content="Afikomen, Bible, Search, Read, Passover, Jewish tradition, Christian symbolism, Jesus Christ, redemption, matzah, Seder" />
+        <meta name="author" content="Afikomen App" />
+        <meta property="og:title" content="Afikomen App: Your one stop bible resource & guidance to your daily spiritual life" />
+        <meta property="og:description" content="Your simplified bible resource to search and read Bible passages from the modern & simplified world english translation. Get the insights of the verse you need with the Afikomen App." />
         <meta property="og:type" content="website" />
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
