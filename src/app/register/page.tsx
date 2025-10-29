@@ -11,47 +11,33 @@ export default function RegisterPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [hasRedirected, setHasRedirected] = useState(false)
+  const [pageLoaded, setPageLoaded] = useState(false)
+
+  // Mark page as loaded after a short delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoaded(true)
+    }, 500) // 500ms delay to ensure page is fully loaded
+
+    return () => clearTimeout(timer)
+  }, [])
 
   // Single effect to handle all redirect logic
   useEffect(() => {
     // Prevent multiple redirects
     if (hasRedirected) return
 
-    const token = localStorage.getItem('token')
-    console.log('RegisterPage: Token in localStorage =', token ? 'present' : 'none')
-    
-    // If user is authenticated, redirect immediately
-    if (user && !loading) {
-      console.log('RegisterPage: User is authenticated, redirecting to dashboard')
-      setHasRedirected(true)
-      router.replace('/dashboard')
-      return
-    }
-    
-    // If token exists but user state is not loaded yet, redirect after a short delay
-    if (token && !loading && !user) {
-      console.log('RegisterPage: Token exists but user not loaded, redirecting to dashboard')
-      setHasRedirected(true)
-      router.replace('/dashboard')
-      return
-    }
-  }, [user, loading, router, hasRedirected])
-
-  // Fallback redirect after timeout
-  useEffect(() => {
-    if (hasRedirected) return
-
-    const redirectTimer = setTimeout(() => {
-      const token = localStorage.getItem('token')
-      if (token && !hasRedirected) {
-        console.log('RegisterPage: Fallback redirect after timeout')
+    // Only redirect if user is authenticated AND loading is complete AND page is loaded
+    if (user && !loading && pageLoaded) {
+      const redirectTimer = setTimeout(() => {
+        console.log('RegisterPage: User is authenticated, redirecting to dashboard')
         setHasRedirected(true)
         router.replace('/dashboard')
-      }
-    }, 3000) // 3 second delay
+      }, 1000) // 1 second delay to allow user to see the page
 
-    return () => clearTimeout(redirectTimer)
-  }, [hasRedirected, router])
+      return () => clearTimeout(redirectTimer)
+    }
+  }, [user, loading, pageLoaded, router, hasRedirected])
 
   // Show loading state while checking authentication
   if (loading) {
@@ -66,12 +52,12 @@ export default function RegisterPage() {
   }
 
   // If user is authenticated, show redirecting message
-  if (user) {
+  if (user && pageLoaded) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Redirecting to dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-300">You&apos;re already logged in. Redirecting to dashboard...</p>
         </div>
       </div>
     )

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react'
 
 interface User {
   id: string
@@ -37,19 +37,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [initialized, setInitialized] = useState(false)
+  const loadingRef = useRef(true)
+  const initializedRef = useRef(false)
+  const authCompleteRef = useRef(false)
+
+  // Update refs when state changes
+  useEffect(() => {
+    loadingRef.current = loading
+  }, [loading])
+
+  useEffect(() => {
+    initializedRef.current = initialized
+  }, [initialized])
 
   // Fallback timeout to ensure loading doesn't persist indefinitely
+  // Only set this timeout once when the component mounts
   useEffect(() => {
     const fallbackTimeout = setTimeout(() => {
-      if (loading) {
+      // Only trigger if we're still loading and not initialized and auth hasn't completed
+      if (loadingRef.current && !initializedRef.current && !authCompleteRef.current) {
         console.warn('Auth loading timeout - forcing loading to false. Token:', localStorage.getItem('token') ? 'present' : 'none')
         setLoading(false)
-        setInitialized(true) // Also set initialized to prevent re-initialization
+        setInitialized(true)
+      } else {
+        console.log('AuthContext: Fallback timeout skipped - loading:', loadingRef.current, 'initialized:', initializedRef.current, 'authComplete:', authCompleteRef.current)
       }
-    }, 6000) // 6 second fallback timeout (slightly longer than API timeout)
+    }, 15000) // 15 second fallback timeout (much longer than API timeout)
 
     return () => clearTimeout(fallbackTimeout)
-  }, [loading])
+  }, []) // Empty dependency array - only run once on mount
 
   const refreshTokenInfo = async () => {
     if (!token) return
@@ -71,7 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Prevent multiple initializations
-    if (initialized) return
+    if (initialized) {
+      console.log('AuthContext: Already initialized, skipping')
+      return
+    }
     
     const savedToken = localStorage.getItem('token')
     console.log('AuthContext: Initializing with token:', savedToken ? 'present' : 'none')
@@ -84,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const timeoutId = setTimeout(() => {
         // Create an abort controller for timeout
         const controller = new AbortController()
-        const timeoutId2 = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+        const timeoutId2 = setTimeout(() => controller.abort(), 10000) // 10 second timeout
         
         // Verify token and get user info
         console.log('AuthContext: Making API call to /api/auth/me with token:', savedToken.substring(0, 20) + '...')
@@ -122,6 +141,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               localStorage.removeItem('token')
               setToken(null)
             }
+            // Set loading to false and initialized to true on success
+            setLoading(false)
+            setInitialized(true)
+            authCompleteRef.current = true // Mark authentication as complete
           })
           .catch(error => {
             clearTimeout(timeoutId2)
@@ -136,6 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               console.log('AuthContext: Clearing token due to error')
               localStorage.removeItem('token')
               setToken(null)
+              setLoading(false)
+              setInitialized(true)
             } else {
               console.log('AuthContext: API call aborted (timeout), keeping token')
               // Try to decode token and create basic user state
@@ -150,17 +175,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   tokensUsed: 0,
                   lastTokenReset: new Date().toISOString()
                 })
+                setTokenInfo({
+                  tokenBalance: 100,
+                  tokensUsed: 0,
+                  remainingTokens: 100,
+                  lastTokenReset: new Date().toISOString(),
+                  hasTokens: true
+                })
               } catch (tokenError) {
                 console.error('AuthContext: Failed to decode token:', tokenError)
+                localStorage.removeItem('token')
+                setToken(null)
               }
+              // Set loading to false and initialized to true
+              setLoading(false)
+              setInitialized(true)
+              authCompleteRef.current = true // Mark authentication as complete
             }
-            // Always set loading to false on error
-            setLoading(false)
-            setInitialized(true)
           })
           .finally(() => {
-            setLoading(false)
-            setInitialized(true)
+            // Loading and initialized are already set in success/error handlers
           })
       }, 100) // Small delay to prevent rapid calls
       
@@ -171,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // No token, set states immediately
       setLoading(false)
       setInitialized(true)
+      authCompleteRef.current = true // Mark authentication as complete
     }
   }, [initialized])
 

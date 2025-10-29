@@ -11,61 +11,116 @@ export default function LoginPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [hasRedirected, setHasRedirected] = useState(false)
+  const [pageLoaded, setPageLoaded] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Check if this is a page refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setIsRefreshing(true)
+    }
+    
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
 
   // Debug logging
-  console.log('LoginPage: user =', user ? 'authenticated' : 'not authenticated', 'loading =', loading, 'hasRedirected =', hasRedirected)
+  console.log('LoginPage: user =', user ? 'authenticated' : 'not authenticated', 'loading =', loading, 'hasRedirected =', hasRedirected, 'isRefreshing =', isRefreshing)
 
-  // Single effect to handle all redirect logic
+  // Check for existing authentication on page load/refresh
+  useEffect(() => {
+    const checkExistingAuth = () => {
+      const token = localStorage.getItem('token')
+      console.log('LoginPage: Checking existing auth, token present:', !!token)
+      
+      if (token) {
+        // If token exists, wait for AuthContext to verify it
+        console.log('LoginPage: Token found, waiting for AuthContext verification')
+        
+        // Check if token is expired by trying to decode it
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]))
+          const now = Math.floor(Date.now() / 1000)
+          const isExpired = payload.exp < now
+          
+          if (isExpired) {
+            console.log('LoginPage: Token is expired, clearing it')
+            localStorage.removeItem('token')
+            setPageLoaded(true)
+          } else {
+            console.log('LoginPage: Token is valid, waiting for AuthContext verification')
+          }
+        } catch {
+          console.log('LoginPage: Invalid token format, clearing it')
+          localStorage.removeItem('token')
+          setPageLoaded(true)
+        }
+      } else {
+        // No token, mark page as loaded immediately
+        console.log('LoginPage: No token found, marking page as loaded')
+        setPageLoaded(true)
+      }
+    }
+
+    checkExistingAuth()
+  }, [])
+
+  // Mark page as loaded after a short delay (fallback)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!pageLoaded) {
+        console.log('LoginPage: Fallback timer - marking page as loaded')
+        setPageLoaded(true)
+      }
+    }, 1000) // 1 second fallback delay
+
+    return () => clearTimeout(timer)
+  }, [pageLoaded])
+
+  // Enhanced redirect logic for authenticated users
   useEffect(() => {
     // Prevent multiple redirects
     if (hasRedirected) return
 
-    const token = localStorage.getItem('token')
-    console.log('LoginPage: Token in localStorage =', token ? 'present' : 'none')
-    
-    // If user is authenticated, redirect immediately
+    // Check if user is authenticated and loading is complete
     if (user && !loading) {
-      console.log('LoginPage: User is authenticated, redirecting to dashboard')
-      setHasRedirected(true)
-      router.replace('/dashboard')
-      return
-    }
-    
-    // If token exists but user state is not loaded yet, redirect after a short delay
-    if (token && !loading && !user) {
-      console.log('LoginPage: Token exists but user not loaded, redirecting to dashboard')
-      setHasRedirected(true)
-      router.replace('/dashboard')
-      return
-    }
-  }, [user, loading, router, hasRedirected])
+      console.log('LoginPage: User is authenticated, preparing redirect')
+      
+      // For page refreshes, redirect immediately
+      if (isRefreshing) {
+        console.log('LoginPage: Page refresh detected, redirecting immediately')
+        setHasRedirected(true)
+        router.replace('/dashboard')
+        return
+      }
+      
+      // For normal navigation, wait for page to load and show message
+      if (pageLoaded) {
+        const redirectTimer = setTimeout(() => {
+          console.log('LoginPage: User is authenticated, redirecting to dashboard')
+          setHasRedirected(true)
+          router.replace('/dashboard')
+        }, 1000) // 1 second delay to allow user to see the page
 
-  // Fallback redirect after timeout
+        return () => clearTimeout(redirectTimer)
+      }
+    }
+  }, [user, loading, pageLoaded, isRefreshing, router, hasRedirected])
+
+  // Additional check for immediate redirect on page refresh with valid token
   useEffect(() => {
     if (hasRedirected) return
 
-    const redirectTimer = setTimeout(() => {
-      const token = localStorage.getItem('token')
-      if (token && !hasRedirected) {
-        console.log('LoginPage: Fallback redirect after timeout')
-        setHasRedirected(true)
-        router.replace('/dashboard')
-      }
-    }, 3000) // 3 second delay
+    const token = localStorage.getItem('token')
+    if (token && !loading && !user && isRefreshing) {
+      console.log('LoginPage: Token found on refresh, waiting for AuthContext to verify')
+      // Don't redirect immediately, let AuthContext handle the verification
+    }
+  }, [loading, user, isRefreshing, hasRedirected])
 
-    return () => clearTimeout(redirectTimer)
-  }, [hasRedirected, router])
-
-  // Add a fallback timeout for loading state
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (loading) {
-        console.warn('Login page: Loading timeout - this might indicate an auth issue')
-      }
-    }, 8000) // 8 second timeout
-
-    return () => clearTimeout(timeout)
-  }, [loading])
 
   // Show loading state while checking authentication
   if (loading) {
@@ -73,19 +128,26 @@ export default function LoginPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            {isRefreshing ? 'Refreshing...' : 'Loading...'}
+          </p>
         </div>
       </div>
     )
   }
 
   // If user is authenticated, show redirecting message
-  if (user) {
+  if (user && (pageLoaded || isRefreshing)) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Redirecting to dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            {isRefreshing 
+              ? 'Welcome back! Redirecting to dashboard...' 
+              : 'You&apos;re already logged in. Redirecting to dashboard...'
+            }
+          </p>
         </div>
       </div>
     )
