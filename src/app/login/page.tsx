@@ -28,17 +28,17 @@ export default function LoginPage() {
   }, [])
 
   // Debug logging
-  console.log('LoginPage: user =', user ? 'authenticated' : 'not authenticated', 'loading =', loading, 'hasRedirected =', hasRedirected, 'isRefreshing =', isRefreshing)
+  // console.log('LoginPage: user =', user ? 'authenticated' : 'not authenticated', 'loading =', loading, 'hasRedirected =', hasRedirected, 'isRefreshing =', isRefreshing)
 
   // Check for existing authentication on page load/refresh
   useEffect(() => {
     const checkExistingAuth = () => {
       const token = localStorage.getItem('token')
-      console.log('LoginPage: Checking existing auth, token present:', !!token)
+      // console.log('LoginPage: Checking existing auth, token present:', !!token)
       
       if (token) {
         // If token exists, wait for AuthContext to verify it
-        console.log('LoginPage: Token found, waiting for AuthContext verification')
+        // console.log('LoginPage: Token found, waiting for AuthContext verification')
         
         // Check if token is expired by trying to decode it
         try {
@@ -47,20 +47,20 @@ export default function LoginPage() {
           const isExpired = payload.exp < now
           
           if (isExpired) {
-            console.log('LoginPage: Token is expired, clearing it')
+            // console.log('LoginPage: Token is expired, clearing it')
             localStorage.removeItem('token')
             setPageLoaded(true)
           } else {
             console.log('LoginPage: Token is valid, waiting for AuthContext verification')
           }
         } catch {
-          console.log('LoginPage: Invalid token format, clearing it')
+          // console.log('LoginPage: Invalid token format, clearing it')
           localStorage.removeItem('token')
           setPageLoaded(true)
         }
       } else {
         // No token, mark page as loaded immediately
-        console.log('LoginPage: No token found, marking page as loaded')
+        // console.log('LoginPage: No token found, marking page as loaded')
         setPageLoaded(true)
       }
     }
@@ -72,7 +72,7 @@ export default function LoginPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!pageLoaded) {
-        console.log('LoginPage: Fallback timer - marking page as loaded')
+        // console.log('LoginPage: Fallback timer - marking page as loaded')
         setPageLoaded(true)
       }
     }, 1000) // 1 second fallback delay
@@ -87,11 +87,11 @@ export default function LoginPage() {
 
     // Check if user is authenticated and loading is complete
     if (user && !loading) {
-      console.log('LoginPage: User is authenticated, preparing redirect')
+      // console.log('LoginPage: User is authenticated, preparing redirect')
       
       // For page refreshes, redirect immediately
       if (isRefreshing) {
-        console.log('LoginPage: Page refresh detected, redirecting immediately')
+        // console.log('LoginPage: Page refresh detected, redirecting immediately')
         setHasRedirected(true)
         router.replace('/dashboard')
         return
@@ -100,7 +100,7 @@ export default function LoginPage() {
       // For normal navigation, wait for page to load and show message
       if (pageLoaded) {
         const redirectTimer = setTimeout(() => {
-          console.log('LoginPage: User is authenticated, redirecting to dashboard')
+          // console.log('LoginPage: User is authenticated, redirecting to dashboard')
           setHasRedirected(true)
           router.replace('/dashboard')
         }, 1000) // 1 second delay to allow user to see the page
@@ -145,7 +145,7 @@ export default function LoginPage() {
           <p className="text-gray-600 dark:text-gray-300">
             {isRefreshing 
               ? 'Welcome back! Redirecting to dashboard...' 
-              : 'You&apos;re already logged in. Redirecting to dashboard...'
+              : 'You are already logged in. Redirecting to dashboard...' 
             }
           </p>
         </div>

@@ -32,7 +32,13 @@ export default function LoginForm() {
         await login(data.token, data.user)
         router.push('/dashboard')
       } else {
-        setError(data.error || 'Login failed')
+        // Handle rate limiting errors specifically
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After') || data.retryAfter || '1'
+          setError(`Too many login attempts. Please wait ${retryAfter} second${retryAfter !== '1' ? 's' : ''} and try again.`)
+        } else {
+          setError(data.error || data.message || 'Login failed')
+        }
       }
     } catch {
       setError('Network error. Please try again.')

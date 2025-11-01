@@ -50,22 +50,7 @@ export function createRateLimit(config: RateLimitConfig) {
       entry.resetTime = now + config.windowMs
     }
 
-    // Special handling for rapid successive requests (likely page navigation)
-    // Allow up to 5 requests within 1 second for the same IP
-    const rapidRequestWindow = 1000 // 1 second
-    const rapidRequestLimit = 5
-    
-    if (entry.count < rapidRequestLimit && (now - (entry.resetTime - config.windowMs)) < rapidRequestWindow) {
-      entry.count++
-      return {
-        success: true,
-        limit: config.maxRequests,
-        remaining: config.maxRequests - entry.count,
-        resetTime: entry.resetTime
-      }
-    }
-
-    // Check limit
+    // Check limit first
     if (entry.count >= config.maxRequests) {
       return {
         success: false,
@@ -75,7 +60,7 @@ export function createRateLimit(config: RateLimitConfig) {
       }
     }
 
-    // Increment counter
+    // Increment counter before returning
     entry.count++
 
     return {
@@ -99,13 +84,23 @@ function getClientIP(request: NextRequest): string {
     return realIP
   }
   
-  return 'unknown'
+  // In development, use a combination of headers to create a unique identifier
+  // This prevents all requests from being grouped as 'unknown'
+  // Note: In production, always use actual IP addresses from headers
+  const userAgent = request.headers.get('user-agent') || 'unknown-agent'
+  const acceptLanguage = request.headers.get('accept-language') || 'unknown-lang'
+  
+  // Create a consistent identifier from client headers (not URL)
+  // This ensures rate limiting works per client, not per endpoint
+  const identifier = `${userAgent.slice(0, 30)}-${acceptLanguage.slice(0, 10)}`
+  
+  return identifier
 }
 
 // Pre-configured rate limiters
 export const authRateLimit = createRateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  maxRequests: 20 // 20 auth requests per 5 minutes (more generous for normal usage)
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 50 // 50 auth requests per 15 minutes (generous for development and normal usage)
 })
 
 // Rate limiter for verse processing with longer window

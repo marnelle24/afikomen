@@ -54,11 +54,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Only set this timeout once when the component mounts
   useEffect(() => {
     const fallbackTimeout = setTimeout(() => {
-      // Only trigger if we're still loading and not initialized and auth hasn't completed
-      if (loadingRef.current && !initializedRef.current && !authCompleteRef.current) {
+      // Check if we're still in a bad state (loading but initialized but not complete)
+      if (loadingRef.current && initializedRef.current && !authCompleteRef.current) {
+        console.warn('AuthContext: Stuck state detected (loading=true, initialized=true, authComplete=false) - forcing completion')
+        setLoading(false)
+        authCompleteRef.current = true
+      } else if (loadingRef.current && !initializedRef.current && !authCompleteRef.current) {
         console.warn('Auth loading timeout - forcing loading to false. Token:', localStorage.getItem('token') ? 'present' : 'none')
         setLoading(false)
         setInitialized(true)
+        authCompleteRef.current = true
       } else {
         console.log('AuthContext: Fallback timeout skipped - loading:', loadingRef.current, 'initialized:', initializedRef.current, 'authComplete:', authCompleteRef.current)
       }
@@ -85,19 +90,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Separate effect to handle stuck state (initialized but still loading)
   useEffect(() => {
+    if (initialized && loading && !authCompleteRef.current) {
+      console.warn('AuthContext: Stuck state detected in useEffect (initialized=true, loading=true, authComplete=false) - forcing completion')
+      setLoading(false)
+      authCompleteRef.current = true
+    }
+  }, [initialized, loading])
+
+  useEffect(() => {
+    // Reset auth complete ref on mount/reload to ensure fresh state
+    authCompleteRef.current = false
+    
     // Prevent multiple initializations
     if (initialized) {
-      console.log('AuthContext: Already initialized, skipping')
+      // console.log('AuthContext: Already initialized, skipping')
       return
     }
     
     const savedToken = localStorage.getItem('token')
-    console.log('AuthContext: Initializing with token:', savedToken ? 'present' : 'none')
+    // console.log('AuthContext: Initializing with token:', savedToken ? 'present' : 'none')
     
     if (savedToken) {
       setToken(savedToken)
-      setInitialized(true)
+      // Don't set initialized yet - wait for API call to complete
       
       // Add a small delay to prevent rapid API calls
       const timeoutId = setTimeout(() => {
@@ -106,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const timeoutId2 = setTimeout(() => controller.abort(), 10000) // 10 second timeout
         
         // Verify token and get user info
-        console.log('AuthContext: Making API call to /api/auth/me with token:', savedToken.substring(0, 20) + '...')
+        // console.log('AuthContext: Making API call to /api/auth/me with token:', savedToken.substring(0, 20) + '...')
         fetch('/api/auth/me', {
           headers: {
             'Authorization': `Bearer ${savedToken}`
@@ -115,16 +132,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
           .then(res => {
             clearTimeout(timeoutId2)
-            console.log('AuthContext: API response status:', res.status, res.statusText)
+            // console.log('AuthContext: API response status:', res.status, res.statusText)
             if (!res.ok) {
               throw new Error(`HTTP ${res.status}: ${res.statusText}`)
             }
             return res.json()
           })
           .then(data => {
-            console.log('AuthContext: API response received:', data)
+            // console.log('AuthContext: API response received:', data)
             if (data.user) {
-              console.log('AuthContext: Setting user data:', data.user)
+              // console.log('AuthContext: Setting user data:', data.user)
               setUser(data.user)
               // Use token info from user data if available
               if (data.user.tokenBalance !== undefined) {
@@ -136,15 +153,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   hasTokens: (data.user.tokenBalance || 0) - (data.user.tokensUsed || 0) > 0
                 })
               }
+              // Set loading to false and initialized to true on success
+              setLoading(false)
+              setInitialized(true)
+              authCompleteRef.current = true // Mark authentication as complete
             } else {
-              console.log('No user data received, clearing auth')
+              // console.log('No user data received, clearing auth')
               localStorage.removeItem('token')
               setToken(null)
+              setLoading(false)
+              setInitialized(true)
+              authCompleteRef.current = true // Mark as complete even on failure
             }
-            // Set loading to false and initialized to true on success
-            setLoading(false)
-            setInitialized(true)
-            authCompleteRef.current = true // Mark authentication as complete
           })
           .catch(error => {
             clearTimeout(timeoutId2)
@@ -156,17 +176,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
             // Only clear token if it's not an abort error (timeout)
             if (error.name !== 'AbortError') {
-              console.log('AuthContext: Clearing token due to error')
+              // console.log('AuthContext: Clearing token due to error')
               localStorage.removeItem('token')
               setToken(null)
               setLoading(false)
               setInitialized(true)
+              authCompleteRef.current = true // Mark authentication as complete
             } else {
-              console.log('AuthContext: API call aborted (timeout), keeping token')
+              // console.log('AuthContext: API call aborted (timeout), keeping token')
               // Try to decode token and create basic user state
               try {
                 const tokenPayload = JSON.parse(atob(savedToken.split('.')[1]))
-                console.log('AuthContext: Creating basic user from token payload:', tokenPayload)
+                // console.log('AuthContext: Creating basic user from token payload:', tokenPayload)
                 setUser({
                   id: tokenPayload.userId,
                   email: tokenPayload.email,
